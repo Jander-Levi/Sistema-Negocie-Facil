@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Clientes - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+        <nav>
+            <a href="dashboard.html">Visão Geral</a>
+            <a href="negociacoes.html">Solicitações de Acordo</a>
+            <a href="clientes.html" class="active">Gestão de Clientes</a>
+            <a href="debitos.html">Gestão de Débitos</a>
+            <a href="usuarios.html">Equipe / Usuários</a>
+            <a href="logs.html">Auditoria e Logs</a>
+            <a href="configuracoes.html">Configurações</a>
+        </nav>
+        <a href="#" id="btnSairAdmin" class="btn-logout">Sair do Sistema</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-admin">
+            <h1>Gestão de Clientes</h1>
+        </header>
+
+        <div class="card-admin" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h2 style="margin-bottom:5px;">Clientes Cadastrados</h2>
+                <p>Lista dos clientes habilitados a buscar seus débitos pelo CPF.</p>
+            </div>
+            <button class="btn btn-outline" style="border-color: var(--cor-principal); color: var(--cor-principal);" onclick="abrirModalCliente()">+ Novo Cliente</button>
+        </div>
+
+        <div class="card-admin">
+            <div style="overflow-x: auto;">
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome Completo</th>
+                            <th>CPF</th>
+                            <th>Telefone Contato</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblClientes">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal CRUD Cliente -->
+    <div id="modalCliente" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%;">
+            <h2 id="modalTitleCli" style="margin-bottom: 20px; color: var(--cor-principal);">Cadastrar Cliente</h2>
+            <!-- DADOS DO CLIENTE - ÁREA EDITÁVEL -->
+            <form id="formCliente">
+                <input type="hidden" id="cliId">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="cliNome" required>
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" id="cliCpf" placeholder="000.000.000-00" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="text" id="cliTelefone" required>
+                </div>
+                <div class="form-group">
+                    <label>Dado Validação (Nascimento)</label>
+                    <input type="text" id="cliDado" placeholder="Ex: 01/01/1990" required>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button type="submit" class="btn" style="flex: 1;">Salvar Dados</button>
+                    <button type="button" class="btn btn-outline" onclick="fecharModalCliente()" style="flex: 1; border-color: #64748b; color: #64748b;">Cancelar</button>
+                </div>
+            </form>
+            <!-- FIM DADOS DO CLIENTE -->
+        </div>
+    </div>
+
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+    <script>
+        const modal = document.getElementById('modalCliente');
+        const form = document.getElementById('formCliente');
+
+        function abrirModalCliente() {
+            document.getElementById('modalTitleCli').innerText = 'Cadastrar Novo Cliente';
+            form.reset();
+            document.getElementById('cliId').value = '';
+            modal.style.display = 'flex';
+        }
+
+        function fecharModalCliente() {
+            modal.style.display = 'none';
+        }
+
+        function carregarTabela() {
+            const clientes = AppData.get('clientes');
+            const tbody = document.getElementById('tblClientes');
+            tbody.innerHTML = '';
+            
+            clientes.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.id}</td>
+                    <td><strong>${c.nome}</strong></td>
+                    <td>${c.cpf}</td>
+                    <td>${c.telefone}</td>
+                    <td>
+                        <button class="btn btn-outline" style="padding:4px 8px; margin-right: 5px; font-size:0.8rem;" onclick='editar(${JSON.stringify(c).replace(/'/g, "&apos;")})'>Editar</button>
+                        <button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem; border-color: red; color: red;" onclick='excluir(${c.id})'>Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editar(c) {
+            document.getElementById('modalTitleCli').innerText = 'Editar Cliente';
+            document.getElementById('cliId').value = c.id;
+            document.getElementById('cliNome').value = c.nome;
+            document.getElementById('cliCpf').value = c.cpf;
+            document.getElementById('cliTelefone').value = c.telefone;
+            document.getElementById('cliDado').value = c.dadoValidacao;
+            modal.style.display = 'flex';
+        }
+
+        function excluir(id) {
+            if(confirm('Tem certeza que deseja excluir este cliente e todos os seus débitos/solicitações vinculadas? Essa ação não pode ser desfeita.')) {
+                const sucesso = AppData.deleteCliente(id);
+                if(sucesso) {
+                    alert('Cliente excluído com sucesso!');
+                    carregarTabela();
+                } else {
+                    alert('Não foi possível excluir o cliente. Verifique se ele existe.');
+                }
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('cliId').value;
+            const clientes = AppData.get('clientes');
+            const admin = JSON.parse(sessionStorage.getItem('adminLogado'));
+            
+            const novoCliente = {
+                id: id ? parseInt(id) : Date.now(),
+                nome: document.getElementById('cliNome').value.trim(),
+                cpf: document.getElementById('cliCpf').value.trim(),
+                telefone: document.getElementById('cliTelefone').value.trim(),
+                dadoValidacao: document.getElementById('cliDado').value.trim()
+            };
+
+            if (id) {
+                const index = clientes.findIndex(c => c.id == id);
+                if(index > -1) {
+                    clientes[index] = novoCliente;
+                    AppData.logAction(admin.nome, "EDICAO_CLIENTE", `Dados do cliente ${novoCliente.nome} alterados.`, novoCliente.cpf);
+                }
+            } else {
+                clientes.push(novoCliente);
+                AppData.logAction(admin.nome, "CRIACAO_CLIENTE", `Novo cliente cadastrado: ${novoCliente.nome}`, novoCliente.cpf);
+            }
+
+            AppData.set('clientes', clientes);
+            fecharModalCliente();
+            carregarTabela();
+        });
+
+        document.addEventListener("DOMContentLoaded", carregarTabela);
+    </script>
+</body>
+</html>

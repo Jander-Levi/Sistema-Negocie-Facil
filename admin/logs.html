@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico e Auditoria - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<!-- ÁREA INTERNA DO ADMIN – NÃO EXPOR -->
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+        <nav>
+            <a href="dashboard.html">Visão Geral</a>
+            <a href="negociacoes.html">Solicitações de Acordo</a>
+            <a href="clientes.html">Gestão de Clientes</a>
+            <a href="debitos.html">Gestão de Débitos</a>
+            <a href="usuarios.html">Equipe / Usuários</a>
+            <a href="logs.html" class="active">Auditoria e Logs</a>
+            <a href="configuracoes.html">Configurações</a>
+        </nav>
+        <a href="#" id="btnSairAdmin" class="btn-logout">Sair do Sistema</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-admin">
+            <h1>Auditoria do Sistema</h1>
+        </header>
+
+        <div class="card-admin" style="background-color: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+            <p style="margin-bottom: 10px; font-weight: bold; color: var(--cor-principal);">Filtros de Busca</p>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <input type="text" id="filtroUsuario" placeholder="Buscar por Usuário..." style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 200px;">
+                <select id="filtroAcao" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 200px;">
+                    <option value="">Todas as Ações</option>
+                    <option value="CONSULTA_CPF">Consultas Públicas de CPF</option>
+                    <option value="LOGIN">Acessos Internos</option>
+                    <option value="NOVA_SOLICITACAO">Novas Negociações Inciadas</option>
+                    <option value="CRIACAO_BOLETO">Emissões de Boleto</option>
+                </select>
+                <input type="date" id="filtroData" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+                <button class="btn" onclick="aplicarFiltros()" style="min-width: 120px;">Filtrar</button>
+            </div>
+        </div>
+
+        <div class="card-admin">
+            <h2 style="margin-bottom:15px;">Registro de Atividades (Logs)</h2>
+            <div style="overflow-x: auto;">
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>Data / Hora</th>
+                            <th>Responsável</th>
+                            <th>Ação</th>
+                            <th>Detalhes Técnicos</th>
+                            <th>CPF Referência</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblLogs">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+    <script>
+        function carregarLogs(filtros = {}) {
+            let logs = AppData.get('logs').sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora));
+            
+            // Aplicação de filtros
+            if(filtros.usuario) {
+                logs = logs.filter(l => l.usuario.toLowerCase().includes(filtros.usuario.toLowerCase()));
+            }
+            if(filtros.acao) {
+                logs = logs.filter(l => l.tipoAcao === filtros.acao);
+            }
+            if(filtros.dataStr) {
+                logs = logs.filter(l => l.dataHora.startsWith(filtros.dataStr));
+            }
+
+            const tbody = document.getElementById('tblLogs');
+            tbody.innerHTML = '';
+            
+            if(logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" align="center" style="color:#64748b;">Nenhum registro encontrado.</td></tr>';
+                return;
+            }
+
+            logs.forEach(l => {
+                let badgeClass = 'badge-info';
+                if(l.tipoAcao === 'CONSULTA_CPF') badgeClass = 'badge-warning';
+                if(l.tipoAcao.includes('LOGIN')) badgeClass = 'badge-success';
+                if(l.tipoAcao === 'LOGIN_FALHA') badgeClass = 'badge-danger';
+
+                const dataF = new Date(l.dataHora).toLocaleString('pt-BR');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="white-space: nowrap;">${dataF}</td>
+                    <td><strong>${l.usuario}</strong></td>
+                    <td><span class="badge ${badgeClass}">${l.tipoAcao}</span></td>
+                    <td style="max-width: 400px; font-size: 0.9em; color: #475569;">${l.detalhes}</td>
+                    <td>${l.cpfRelacionado || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function aplicarFiltros() {
+            const fUsu = document.getElementById('filtroUsuario').value;
+            const fAcao = document.getElementById('filtroAcao').value;
+            const fData = document.getElementById('filtroData').value;
+            carregarLogs({ usuario: fUsu, acao: fAcao, dataStr: fData });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => carregarLogs());
+    </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo de Acordo - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        .termo-container { max-width: 800px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .termo-header { text-align: center; border-bottom: 2px solid var(--cor-principal); padding-bottom: 20px; margin-bottom: 20px; }
+        .termo-header h1 { color: var(--cor-principal); margin-bottom: 10px; }
+        .termo-body { font-size: 1.1rem; line-height: 1.6; color: #334155; }
+        .termo-tabela { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px; }
+        .termo-tabela th, .termo-tabela td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; }
+        .termo-tabela th { background: #f8fafc; }
+        .termo-footer { margin-top: 40px; text-align: center; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+        @media print {
+            body { background: #fff; padding: 0; margin: 0; }
+            .btn, header { display: none !important; }
+            .termo-container { box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<body>
+    <header>
+        <a href="resultado.html" class="btn btn-outline" style="background: white; border-color: white; color: var(--cor-principal);">Voltar</a>
+        <button onclick="window.print()" class="btn" style="background: white; color: var(--cor-principal);">Imprimir / Salvar PDF</button>
+    </header>
+
+    <div class="termo-container">
+        <div class="termo-header">
+            <h1>Termo de Confissão de Dívida e Acordo</h1>
+            <p>Gerado pelo G2G - NegociaFácil</p>
+        </div>
+        <div class="termo-body">
+            <p> Pelo presente instrumento particular de confissão de dívida e acordo (Termo de Acordo), a empresa (Credora) e o (a) cliente (Devedor) firmam o compromisso de renegociação dos débitos listados abaixo.</p>
+            
+            <h3 style="margin-top:20px;">1. Identificação do Cliente</h3>
+            <p><strong>Nome:</strong> <span id="lblNomeCliente"></span><br>
+            <strong>CPF:</strong> <span id="lblCpfCliente"></span></p>
+
+            <h3 style="margin-top:20px;">2. Condição do Acordo Firmado</h3>
+            <p><strong>Número da Solicitação:</strong> #<span id="lblNumProtocolo"></span><br>
+            <strong>Data da Solicitação:</strong> <span id="lblDataAcordo"></span><br>
+            <strong>Forma de Pagamento:</strong> <span id="lblCondicao"></span><br>
+            <strong>Condição de Parcelamento:</strong> <span id="lblParcelas"></span><br>
+            <strong>Valor Total Pactuado:</strong> <span id="lblValorTotal" style="color:red; font-weight:bold;"></span></p>
+
+            <h3 style="margin-top:20px;">3. Débitos Originais Consolidados</h3>
+            <table class="termo-tabela">
+                <thead>
+                    <tr>
+                        <th>Identificação do Débito</th>
+                        <th>Vencimento Original</th>
+                        <th>Valor Original</th>
+                    </tr>
+                </thead>
+                <tbody id="tblDebitosOriginais">
+                </tbody>
+            </table>
+
+            <p style="margin-top: 30px;">
+                O cliente reconhece a exatidão dos valores supracitados e compromete-se a pagar o montante no prazo e forma estipulada via boleto/Pix emitido ou anexo neste sistema.
+                O não pagamento do acordo implicará o cancelamento automático da renegociação, voltando o débito à sua condição de inadimplência com os encargos originais.
+            </p>
+        </div>
+        
+        <div class="termo-footer">
+            <p>Documento gerado eletronicamente e validado pelo aceite digital do usuário no sistema G2G - NegociaFácil Pro.</p>
+        </div>
+    </div>
+
+    <script src="../data/db.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const acordoId = parseInt(urlParams.get('id'));
+
+            if(!acordoId) {
+                alert("Código de acordo inválido ou não informado.");
+                window.location.href = '../index.html';
+                return;
+            }
+
+            const solicitacoes = AppData.get('solicitacoes');
+            const acordo = solicitacoes.find(s => s.id === acordoId);
+            
+            if(!acordo) {
+                alert("Acordo não encontrado no sistema.");
+                window.location.href = '../index.html';
+                return;
+            }
+            
+            const clienteLogadoId = sessionStorage.getItem('clienteLogadoId');
+            if(clienteLogadoId && parseInt(clienteLogadoId) !== acordo.clienteId) {
+                alert("Você não tem permissão para visualizar este acordo.");
+                window.location.href = '../index.html';
+                return;
+            }
+
+            const clienteId = acordo.clienteId;
+            const clientes = AppData.get('clientes');
+            const cliente = clientes.find(c => c.id === clienteId);
+            
+            document.getElementById('lblNomeCliente').innerText = cliente.nome;
+            document.getElementById('lblCpfCliente').innerText = cliente.cpf;
+            
+            document.getElementById('lblNumProtocolo').innerText = acordo.id;
+            document.getElementById('lblDataAcordo').innerText = new Date(acordo.dataSolicitacao).toLocaleDateString('pt-BR');
+            document.getElementById('lblCondicao').innerText = acordo.formaPagamento;
+            if(acordo.parcelas && acordo.valorParcela) {
+                document.getElementById('lblParcelas').innerText = `${acordo.parcelas}x de R$ ${acordo.valorParcela.toFixed(2).replace('.', ',')}`;
+            } else {
+                document.getElementById('lblParcelas').innerText = '1x (À vista ou Opção única)';
+            }
+            document.getElementById('lblValorTotal').innerText = `R$ ${acordo.valorTotalAcordo.toFixed(2).replace('.', ',')}`;
+
+            const todosDebitos = AppData.get('debitos');
+            const tbody = document.getElementById('tblDebitosOriginais');
+            
+            acordo.debitosIds.forEach(idDeb => {
+                const deb = todosDebitos.find(d => d.id === idDeb);
+                if(deb) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${deb.descricao}</td>
+                        <td>${deb.vencimentoOriginal.split('-').reverse().join('/')}</td>
+                        <td>R$ ${deb.valorOriginal.toFixed(2).replace('.', ',')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

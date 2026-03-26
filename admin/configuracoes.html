@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurações - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+        <nav>
+            <a href="dashboard.html">Visão Geral</a>
+            <a href="negociacoes.html">Solicitações de Acordo</a>
+            <a href="clientes.html">Gestão de Clientes</a>
+            <a href="debitos.html">Gestão de Débitos</a>
+            <a href="usuarios.html">Equipe / Usuários</a>
+            <a href="configuracoes.html" class="active">Configurações</a>
+        </nav>
+        <a href="#" id="btnSairAdmin" class="btn-logout">Sair do Sistema</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-admin">
+            <h1>Configurações do Sistema</h1>
+        </header>
+
+        <div class="card-admin" style="border-left: 4px solid var(--cor-principal);">
+            <h2 style="margin-bottom:15px;">Manutenção e Regras de Negociação</h2>
+            <p style="margin-bottom:15px; color:#64748b;">
+                As condições de parcelamento estão centralizadas no arquivo <strong>data/db.js</strong>, conforme especificado na documentação do projeto, facilitando a manutenção para iniciantes.
+            </p>
+            
+            <div style="background-color: #1e293b; color: #fbbf24; padding: 15px; border-radius: 5px; font-family: monospace; margin-bottom: 20px;">
+                // Exemplo: Edite o array AppData.condicoesNegociacao<br>
+                { id: 1, parcelas: 1, jurosAoMes: 0, descricao: "À vista" }
+            </div>
+            
+            <h3 style="margin-bottom: 10px;">Comandos Úteis</h3>
+            <p style="margin-bottom: 20px;">Você pode resetar todos os dados locais para testar a aplicação no modo de fábrica.</p>
+            <button class="btn btn-outline" style="border-color: #ef4444; color: #ef4444;" onclick="if(confirm('Isso apagará todas as solicitações e testes. Tem certeza?')) { AppData.clear(); alert('Mock Resetado!'); window.location.reload(); }">Resetar Base de Dados de Teste</button>
+        </div>
+    </main>
+
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+</body>
+</html>

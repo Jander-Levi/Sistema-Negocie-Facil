@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Usuários - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<!-- ÁREA INTERNA DO ADMIN – NÃO EXPOR -->
+<!-- PROTEÇÃO DE ROTA ADMIN GARANTIDA PELO admin.js -->
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+        <nav>
+            <a href="dashboard.html">Visão Geral</a>
+            <a href="negociacoes.html">Solicitações de Acordo</a>
+            <a href="clientes.html">Gestão de Clientes</a>
+            <a href="debitos.html">Gestão de Débitos</a>
+            <a href="usuarios.html" class="active">Equipe / Usuários</a>
+            <a href="logs.html">Auditoria e Logs</a>
+            <a href="configuracoes.html">Configurações</a>
+        </nav>
+        <a href="#" id="btnSairAdmin" class="btn-logout">Sair do Sistema</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-admin">
+            <h1>Gestão de Usuários</h1>
+        </header>
+
+        <div class="card-admin" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h2 style="margin-bottom:5px;">Equipe Cadastrada</h2>
+                <p>Gerencie quem tem acesso ao painel.</p>
+            </div>
+            <button class="btn btn-outline" style="border-color: var(--cor-principal); color: var(--cor-principal);" onclick="abrirModalUsuario()">+ Novo Usuário</button>
+        </div>
+
+        <div class="card-admin">
+            <div style="overflow-x: auto;">
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Login / E-mail</th>
+                            <th>Perfil / Nível</th>
+                            <th>Status Ativo</th>
+                            <th>Último Acesso</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblUsuarios">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal CRUD Usuário -->
+    <div id="modalUsuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%;">
+            <h2 id="modalTitle" style="margin-bottom: 20px; color: var(--cor-principal);">Cadastrar Usuário</h2>
+            <form id="formUsuario">
+                <input type="hidden" id="usrId">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="usrNome" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail (Login)</label>
+                    <input type="email" id="usrEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="usrSenha" placeholder="Deixe em branco para não alterar na edição">
+                </div>
+                <div class="form-group">
+                    <label>Perfil (Nível de Acesso)</label>
+                    <select id="usrPerfil" required>
+                        <option value="atendente">Atendente (Operador)</option>
+                        <option value="administrador">Administrador (Master)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="usrStatus">
+                        <option value="ativo">Ativo - Pode Acessar</option>
+                        <option value="bloqueado">Bloqueado / Inativo</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button type="submit" class="btn" style="flex: 1;">Salvar Usuário</button>
+                    <button type="button" class="btn btn-outline" onclick="fecharModal()" style="flex: 1; border-color: #64748b; color: #64748b;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+    <script>
+        const modal = document.getElementById('modalUsuario');
+        const form = document.getElementById('formUsuario');
+        
+        function carregarTabela() {
+            const usuarios = AppData.get('usuarios');
+            const tbody = document.getElementById('tblUsuarios');
+            tbody.innerHTML = '';
+            
+            usuarios.forEach(u => {
+                const statusStr = (typeof u.status === 'undefined' || u.status === 'ativo') ? '<span class="badge badge-success">Ativo</span>' : '<span class="badge badge-danger">Bloqueado</span>';
+                const ultimoLog = AppData.get('logs').filter(l => l.usuario === u.nome && l.tipoAcao === 'LOGIN').pop();
+                const ultimoAcesso = ultimoLog ? new Date(ultimoLog.dataHora).toLocaleString('pt-BR') : 'Nunca';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${u.nome}</strong></td>
+                    <td>${u.email}</td>
+                    <td><span class="badge ${u.perfil === 'administrador' ? 'badge-danger' : 'badge-info'}">${u.perfil.toUpperCase()}</span></td>
+                    <td>${statusStr}</td>
+                    <td><small>${ultimoAcesso}</small></td>
+                    <td>
+                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;" onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&apos;")})'>Editar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function abrirModalUsuario() {
+            document.getElementById('modalTitle').innerText = 'Cadastrar Novo Usuário';
+            form.reset();
+            document.getElementById('usrId').value = '';
+            document.getElementById('usrSenha').required = true;
+            modal.style.display = 'flex';
+        }
+
+        function editarUsuario(u) {
+            document.getElementById('modalTitle').innerText = 'Editar Usuário';
+            document.getElementById('usrId').value = u.id;
+            document.getElementById('usrNome').value = u.nome;
+            document.getElementById('usrEmail').value = u.email;
+            document.getElementById('usrSenha').value = '';
+            document.getElementById('usrSenha').required = false;
+            document.getElementById('usrPerfil').value = u.perfil;
+            document.getElementById('usrStatus').value = typeof u.status !== 'undefined' ? u.status : 'ativo';
+            modal.style.display = 'flex';
+        }
+
+        function fecharModal() {
+            modal.style.display = 'none';
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('usrId').value;
+            const usuarios = AppData.get('usuarios');
+            const nomeStr = document.getElementById('usrNome').value.trim();
+
+            const adminSessao = JSON.parse(sessionStorage.getItem('adminLogado'));
+            
+            if (id) {
+                // Modo Edição
+                const index = usuarios.findIndex(u => u.id == id);
+                if(index > -1) {
+                    usuarios[index].nome = nomeStr;
+                    usuarios[index].email = document.getElementById('usrEmail').value.trim().toLowerCase();
+                    usuarios[index].perfil = document.getElementById('usrPerfil').value;
+                    usuarios[index].status = document.getElementById('usrStatus').value;
+                    const novaSenha = document.getElementById('usrSenha').value.trim();
+                    if(novaSenha) {
+                        usuarios[index].senha = novaSenha;
+                    }
+                    AppData.logAction(adminSessao.nome, "EDICAO_USUARIO", `Dados atualizados do ID ${id}`);
+                }
+            } else {
+                // Novo Usuário
+                usuarios.push({
+                    id: Date.now(),
+                    nome: nomeStr,
+                    email: document.getElementById('usrEmail').value.trim().toLowerCase(),
+                    senha: document.getElementById('usrSenha').value.trim(),
+                    perfil: document.getElementById('usrPerfil').value,
+                    status: document.getElementById('usrStatus').value
+                });
+                AppData.logAction(adminSessao.nome, "CRIACAO_USUARIO", `Novo usuário cadastrado: ${nomeStr}`);
+            }
+
+            AppData.set('usuarios', usuarios);
+            fecharModal();
+            carregarTabela();
+        });
+
+        document.addEventListener("DOMContentLoaded", carregarTabela);
+    </script>
+</body>
+</html>

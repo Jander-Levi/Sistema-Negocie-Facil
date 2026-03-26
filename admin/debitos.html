@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Débitos - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+        <nav>
+            <a href="dashboard.html">Visão Geral</a>
+            <a href="negociacoes.html">Solicitações de Acordo</a>
+            <a href="clientes.html">Gestão de Clientes</a>
+            <a href="debitos.html" class="active">Gestão de Débitos</a>
+            <a href="usuarios.html">Equipe / Usuários</a>
+            <a href="logs.html">Auditoria e Logs</a>
+            <a href="configuracoes.html">Configurações</a>
+        </nav>
+        <a href="#" id="btnSairAdmin" class="btn-logout">Sair do Sistema</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-admin">
+            <h1>Gestão de Débitos</h1>
+        </header>
+
+        <div class="card-admin" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h2 style="margin-bottom:5px;">Débitos do Sistema</h2>
+                <p>Os débitos vinculados aos clientes que podem ser renegociados.</p>
+            </div>
+            <button class="btn btn-outline" style="border-color: var(--cor-principal); color: var(--cor-principal);" onclick="abrirModalDebito()">+ Lançar Débito</button>
+        </div>
+
+        <div class="card-admin">
+            <div style="overflow-x: auto;">
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>Lanc/Ref</th>
+                            <th>Cliente</th>
+                            <th>Descrição do Débito</th>
+                            <th>Valores (Orig / Atual)</td>
+                            <th>Status</td>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblDebitos">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal CRUD Débito -->
+    <div id="modalDebito" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h2 id="modalTitleDeb" style="margin-bottom: 20px; color: var(--cor-principal);">Lançar Novo Débito</h2>
+            <form id="formDebito">
+                <input type="hidden" id="debId">
+                <div class="form-group">
+                    <label>ID Cliente</label>
+                    <select id="debCliente" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Contrato / Descrição</label>
+                    <input type="text" id="debDesc" placeholder="Descrição do Lançamento" required>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Valor Original</label>
+                        <input type="number" step="0.01" id="debVOriginal" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;" id="divQtdMeses">
+                        <label>Quantidade (Meses)</label>
+                        <input type="number" id="debQtdMeses" value="1" min="1" required>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Vencimento Original</label>
+                        <input type="date" id="debVenc" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Status</label>
+                        <select id="debStatus" required>
+                            <option value="aberto">Aberto</option>
+                            <option value="em_negociacao">Em Negociação</option>
+                            <option value="pago">Pago / Acordo Fechado</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button type="submit" class="btn" style="flex: 1;">Salvar Débito</button>
+                    <button type="button" class="btn btn-outline" onclick="fecharModalDebito()" style="flex: 1; border-color: #64748b; color: #64748b;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+    <script>
+        const modal = document.getElementById('modalDebito');
+        const form = document.getElementById('formDebito');
+
+        function abrirModalDebito() {
+            document.getElementById('modalTitleDeb').innerText = 'Lançar Novo Débito';
+            form.reset();
+            document.getElementById('debId').value = '';
+            document.getElementById('divQtdMeses').style.display = 'block';
+            modal.style.display = 'flex';
+        }
+
+        function fecharModalDebito() {
+            modal.style.display = 'none';
+        }
+
+        function carregarFiltros() {
+            const clientes = AppData.get('clientes');
+            const sel = document.getElementById('debCliente');
+            sel.innerHTML = '<option value="">-- Selecione o Cliente --</option>';
+            clientes.forEach(c => {
+                sel.innerHTML += `<option value="${c.id}">${c.nome} (CPF: ${c.cpf})</option>`;
+            });
+        }
+
+        function carregarTabela() {
+            const debitos = AppData.get('debitos');
+            const clientes = AppData.get('clientes');
+            const tbody = document.getElementById('tblDebitos');
+            tbody.innerHTML = '';
+            
+            debitos.forEach(d => {
+                let badge = 'badge-info';
+                if(d.status === 'aberto') badge = 'badge-danger';
+                if(d.status === 'em_negociacao') badge = 'badge-warning';
+
+                const cli = clientes.find(c => c.id == d.clienteId);
+                const nomeCli = cli ? cli.nome : 'Desconhecido';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${d.id}</td>
+                    <td>${nomeCli}</td>
+                    <td>${d.descricao} <br><small>Venc: ${d.vencimentoOriginal.split('-').reverse().join('/')}</small></td>
+                    <td>R$ ${d.valorOriginal.toFixed(2)} / <strong>R$ ${d.valorAtualizado.toFixed(2)}</strong></td>
+                    <td><span class="badge ${badge}">${d.status}</span></td>
+                    <td>
+                        <!-- Botão que abre o modal para editar o débito - passa o objeto 'd' em formato JSON stringificado -->
+                        <button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem;" onclick='editar(${JSON.stringify(d).replace(/'/g, "&apos;")})'>Editar</button>
+                        
+                        <!-- Botão para exclusão do débito. Chama a função excluirDebito passando o ID do débito como parâmetro -->
+                        <button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem; border-color: red; color: red; margin-left: 5px;" onclick='excluirDebito(${d.id})'>Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Função responsável por excluir um débito do banco de dados (localStorage)
+        function excluirDebito(id) {
+            // Exibe um alerta de confirmação no navegador (retorna true ou false)
+            if (confirm("Tem certeza que deseja excluir este débito? Essa ação não pode ser desfeita.")) {
+                
+                // Pega a lista atual de débitos armazenados
+                let debitos = AppData.get('debitos');
+                
+                // Filtra a lista, removendo o débito cujo ID foi passado na função
+                debitos = debitos.filter(d => d.id !== id);
+                
+                // Salva a nova lista de volta no banco de dados (sobrescrevendo a antiga)
+                AppData.set('debitos', debitos);
+                
+                // Pega as informações do Admin logado ou usa um valor padrão 'Admin'
+                const admin = JSON.parse(sessionStorage.getItem('adminLogado')) || { nome: 'Admin' };
+                
+                // Grava um registro no log do sistema de que o débito foi excluído
+                AppData.logAction(admin.nome, "EXCLUSAO_DEBITO", `Débito ID ${id} excluído.`);
+                
+                // Atualiza a tabela na tela chamando a função carregarTabela() novamente para refletir as exclusões
+                carregarTabela();
+            }
+        }
+
+        function editar(d) {
+            document.getElementById('modalTitleDeb').innerText = 'Editar Débito';
+            document.getElementById('debId').value = d.id;
+            document.getElementById('debCliente').value = d.clienteId;
+            document.getElementById('debDesc').value = d.descricao;
+            document.getElementById('debVOriginal').value = d.valorOriginal;
+            document.getElementById('debVenc').value = d.vencimentoOriginal;
+            document.getElementById('debStatus').value = d.status;
+            document.getElementById('divQtdMeses').style.display = 'none';
+            modal.style.display = 'flex';
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('debId').value;
+            const debitos = AppData.get('debitos');
+            const admin = JSON.parse(sessionStorage.getItem('adminLogado')) || { nome: 'Admin' };
+            
+            const baseDesc = document.getElementById('debDesc').value.trim();
+            const clienteId = parseInt(document.getElementById('debCliente').value);
+            const valorOrig = parseFloat(document.getElementById('debVOriginal').value);
+            const status = document.getElementById('debStatus').value;
+            const vencIni = new Date(document.getElementById('debVenc').value + 'T12:00:00');
+
+            if (id) {
+                const index = debitos.findIndex(d => d.id == id);
+                if(index > -1) {
+                    debitos[index] = {
+                        id: parseInt(id),
+                        clienteId,
+                        descricao: baseDesc,
+                        valorOriginal: valorOrig,
+                        valorAtualizado: valorOrig,
+                        vencimentoOriginal: document.getElementById('debVenc').value,
+                        status
+                    };
+                    AppData.logAction(admin.nome, "EDICAO_DEBITO", `Valores do débito ID ${id} alterados.`);
+                }
+            } else {
+                const qtd = parseInt(document.getElementById('debQtdMeses').value) || 1;
+                for(let i = 0; i < qtd; i++) {
+                    const dataVenc = new Date(vencIni);
+                    dataVenc.setMonth(dataVenc.getMonth() + i);
+                    
+                    const strVenc = dataVenc.toISOString().split('T')[0];
+                    const descFinal = qtd > 1 ? `${baseDesc} (${i+1}/${qtd})` : baseDesc;
+                    
+                    debitos.push({
+                        id: Date.now() + i,
+                        clienteId,
+                        descricao: descFinal,
+                        valorOriginal: valorOrig,
+                        valorAtualizado: valorOrig,
+                        vencimentoOriginal: strVenc,
+                        status
+                    });
+                }
+                AppData.logAction(admin.nome, "CRIACAO_DEBITO", `Lançado(s) ${qtd} novo(s) débito(s): ${baseDesc}`);
+            }
+
+            AppData.set('debitos', debitos);
+            fecharModalDebito();
+            carregarTabela();
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            carregarFiltros();
+            carregarTabela();
+        });
+    </script>
+</body>
+</html>

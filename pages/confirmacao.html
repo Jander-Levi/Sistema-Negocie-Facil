@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitação Concluída - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+
+<body>
+    <header>
+        <a href="../index.html" class="logo"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil</a>
+    </header>
+
+    <!-- INÍCIO DA ÁREA EDITÁVEL - MENSAGEM DE SUCESSO -->
+    <main class="container" style="text-align: center; margin-top: 60px;">
+        <div
+            style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto;">
+            <div style="color: var(--cor-secundaria); font-size: 4rem; margin-bottom: 20px;">&#10004;</div>
+            <h2 style="color: var(--cor-principal); margin-bottom: 20px;">Solicitação Recebida com Sucesso!</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 15px;">Aguarde, sua intenção de acordo foi encaminhada para a
+                equipe financeira.</p>
+            <div
+                style="background-color: #eef5ff; border: 1px solid #c8def9; padding: 25px; border-radius: 5px; margin-bottom: 30px; text-align: center;">
+                <p style="font-size: 1.2rem; margin: 0; color: #333;">O boleto estará disponível aqui após <strong>30 min</strong>, ou você receberá direto no seu WhatsApp cadastrado.</p>
+            </div>
+            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <a id="btnVerTermo" href="#" target="_blank" class="btn btn-outline" style="padding: 10px 30px; border-color: var(--cor-principal); color: var(--cor-principal); display: none;">Ver Termo de Acordo</a>
+                <button id="btnFinalizar" class="btn" style="padding: 10px 30px;">Sair e Voltar ao Início</button>
+            </div>
+        </div>
+    </main>
+    <!-- FIM DA ÁREA EDITÁVEL -->
+
+    <script>
+        const ultimaSolicitacaoId = sessionStorage.getItem('ultimaSolicitacaoId');
+        if (ultimaSolicitacaoId) {
+            const btnTermo = document.getElementById('btnVerTermo');
+            btnTermo.href = `acordo.html?id=${ultimaSolicitacaoId}`;
+            btnTermo.style.display = 'inline-block';
+        }
+
+        document.getElementById('btnFinalizar').addEventListener('click', () => {
+            // Limpa os dados do cliente em sessão e sai
+            sessionStorage.removeItem('clienteLogadoId');
+            sessionStorage.removeItem('debitosSelecionados');
+            sessionStorage.removeItem('opcaoSelecionada');
+            sessionStorage.removeItem('ultimaSolicitacaoId');
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administrativo - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<body style="background-color: #e2e8f0;">
+
+    <div class="login-admin-box">
+        <h2>Acesso Equipe</h2>
+        <form id="formAdminLogin">
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="emailAdmin" placeholder="admin@empresa.com" required>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="senhaAdmin" placeholder="******" required>
+            </div>
+            
+            <div id="erroLogin" style="color: red; margin-bottom: 15px; display: none; text-align: center;">E-mail ou senha incorretos.</div>
+
+            <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 12px; background-color: #1e293b;">Entrar no Sistema</button>
+        </form>
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9em;">
+            Dica para teste: admin@empresa.com / admin <br> ou joao@empresa.com / 123
+        </p>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="../index.html" style="color: #64748b; text-decoration: none;">&larr; Voltar ao Início</a>
+        </div>
+    </div>
+
+    <!-- INÍCIO ÁREA EDITÁVEL - SCRIPTS DE LOGIN -->
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+    <!-- FIM ÁREA EDITÁVEL -->
+</body>
+</html>

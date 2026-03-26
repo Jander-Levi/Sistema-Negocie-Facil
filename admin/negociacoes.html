@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Solicitações - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<body class="admin-body">
+
+    <aside class="sidebar">
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+        <nav>
+            <a href="dashboard.html">Visão Geral</a>
+            <a href="negociacoes.html" class="active">Solicitações de Acordo</a>
+            <a href="clientes.html">Gestão de Clientes</a>
+            <a href="debitos.html">Gestão de Débitos</a>
+        </nav>
+        <a href="#" id="btnSairAdmin" class="btn-logout">Sair do Sistema</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-admin">
+            <h1>Gestão de Solicitações</h1>
+        </header>
+
+        <div class="card-admin">
+            <h2 style="margin-bottom: 15px;">Solicitações de Acordo Abertas</h2>
+            <p style="margin-bottom: 20px; color: #64748b;">
+                Nesta tela o Atendente avalia a intenção do cliente, 
+                gera o boleto no sistema bancário (fora daqui) e anexa a linha digitável para finalizar.
+            </p>
+
+            <div style="overflow-x: auto;">
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Forma de Pag.</th>
+                            <th>Valor do Acordo</th>
+                            <th>Status Revisional</th>
+                            <th>Ações do Atendente</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblNegociacoesBody">
+                        <!-- Preenchido via Javascript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL PARA GERAR BOLETO MANUALMENTE -->
+    <!-- INÍCIO ÁREA EDITÁVEL - FORMULÁRIO DE BOLETO -->
+    <div id="modalBoleto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 450px; max-width: 90%;">
+            <h2 style="margin-bottom: 15px; color: var(--cor-principal);">Gerar Boleto do Acordo</h2>
+            <p style="margin-bottom: 15px;">Emitir boleto para a solicitação <strong id="lblSolicitacaoId"></strong>.</p>
+            
+            <div class="form-group">
+                <label>Linha Digitável / Código de Barras</label>
+                <input type="text" id="txtLinhaDigitavel" placeholder="Ex: 34191.09008 10738.928172..." required>
+                <small style="color: #64748b;">Gere no sistema do banco e cole aqui.</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Anexar Boleto (PDF/Imagem)</label>
+                <input type="file" id="arquivoBoleto" accept=".pdf,image/*">
+                <small style="color: #64748b;">O arquivo ficará disponível para download na área do cliente.</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Observação Interna</label>
+                <input type="text" id="txtObservacao" placeholder="Ex: Acordo fechado sem juros. Enviado via WhatsApp.">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="btnSalvarBoleto" style="flex: 1; padding: 12px; font-size: 1rem;">Finalizar e Marcar como Enviado</button>
+                <button class="btn btn-outline" id="btnCancelarBoleto" style="flex: 1; border-color: #64748b; color: #64748b;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL PARA EDITAR SOLICITAÇÃO -->
+    <div id="modalEditarSolicitacao" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 450px; max-width: 90%;">
+            <h2 style="margin-bottom: 15px; color: var(--cor-principal);">Editar Solicitação</h2>
+            <p style="margin-bottom: 15px;">Atualizar dados da solicitação <strong id="lblEditSolicitacaoId"></strong>.</p>
+            
+            <div class="form-group">
+                <label>Status</label>
+                <select id="editStatus" required>
+                    <option value="pendente_boleto">Pendente de Boleto</option>
+                    <option value="boleto_enviado">Boleto Enviado / Pendente Pgto</option>
+                    <option value="comprovante_enviado">Comprovante Recebido (Analisar)</option>
+                    <option value="pago">Pago / Concluído</option>
+                    <option value="cancelado">Cancelado / Recusado</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Valor Total do Acordo</label>
+                <input type="number" step="0.01" id="editValorTotal" required>
+            </div>
+
+            <div class="form-group">
+                <label>Forma de Pagamento</label>
+                <input type="text" id="editFormaPagamento" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Observação Interna</label>
+                <input type="text" id="editObservacao">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="btnSalvarEdicaoSolicitacao" style="flex: 1; padding: 12px; font-size: 1rem;">Salvar Alterações</button>
+                <button class="btn btn-outline" id="btnCancelarEdicaoSolicitacao" style="flex: 1; border-color: #64748b; color: #64748b;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <!-- FIM ÁREA EDITÁVEL -->
+
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+    <script src="../scripts/admin-negociacoes.js"></script>
+</body>
+</html>

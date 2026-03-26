@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Débitos - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+</head>
+<body>
+    <header>
+        <a href="../index.html" class="logo"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil</a>
+    </header>
+
+    <main class="container">
+        <!-- INÍCIO DA ÁREA EDITÁVEL - TEXTOS DE CONSULTA -->
+        <div class="form-container">
+            <h2 style="color: var(--cor-principal); margin-bottom: 20px; text-align: center;">Consulta de Débitos</h2>
+            <p style="text-align: center; margin-bottom: 20px;">Informe seus dados abaixo para localizar suas pendências com segurança.</p>
+            
+            <form id="formConsulta">
+                <div class="form-group">
+                    <label for="cpf">Seu CPF (Com pontos e traço)</label>
+                    <input type="text" id="cpf" placeholder="Ex: 111.111.111-11" required>
+                </div>
+                <div class="form-group">
+                    <label for="dadoValidacao">Data de Nascimento</label>
+                    <input type="text" id="dadoValidacao" placeholder="Ex: 01/05/1980" required>
+                </div>
+                
+                <!-- Div para mostrar mensagens de erro -->
+                <div id="erroMsg" style="color: #d9534f; background: #fdf7f7; padding: 10px; border-radius: 4px; border: 1px solid #d9534f; margin-bottom: 15px; display: none; text-align: center;"></div>
+
+                <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 12px;">Consultar Meus Débitos</button>
+            </form>
+        </div>
+        <!-- FIM DA ÁREA EDITÁVEL -->
+    </main>
+
+    <!-- Importação dos Scripts -->
+    <script src="../data/db.js"></script>
+    <script src="../scripts/main.js"></script>
+</body>
+</html>
