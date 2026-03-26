@@ -4,6 +4,9 @@
 // Este arquivo simula um banco de dados e contém 
 // as regras e informações que alimentam o site.
 // Edite os valores abaixo com cuidado.
+//
+// RELACIONAMENTO ENTRE CLIENTE, DÉBITOS E NEGOCIAÇÕES
+// AÇÃO VINCULADA AO COLABORADOR RESPONSÁVEL
 // ==========================================
 
 const AppData = {
@@ -113,13 +116,29 @@ const AppData = {
         const novoLog = {
             id: Date.now(),
             dataHora: new Date().toISOString(),
-            usuario: usuario,
-            tipoAcao: tipoAcao, // 'LOGIN', 'CONSULTA_CPF', 'CRIACAO_BOLETO', 'EDICAO_USUARIO'
+            usuario: usuario, // AÇÃO VINCULADA AO COLABORADOR RESPONSÁVEL
+            tipoAcao: tipoAcao, // 'LOGIN', 'CONSULTA_CPF', 'CRIACAO_BOLETO', 'EDICAO_USUARIO', 'NOVO_DEBITO', etc
             detalhes: detalhes,
             cpfRelacionado: cpf
         };
         _logs.push(novoLog);
         this.set('logs', _logs);
+    },
+
+    getClienteCompleto: function(clienteId) {
+        const cliente = this.get('clientes').find(c => c.id === parseInt(clienteId));
+        if (!cliente) return null;
+        
+        const debitos = this.get('debitos').filter(d => d.clienteId === cliente.id);
+        const negociacoes = this.get('solicitacoes').filter(s => s.clienteId === cliente.id);
+        const logs = this.get('logs').filter(l => l.cpfRelacionado === cliente.cpf);
+
+        return {
+            ...cliente,
+            debitos,
+            negociacoes,
+            logs
+        };
     },
 
     clear: function() {

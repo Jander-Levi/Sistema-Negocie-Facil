@@ -220,7 +220,8 @@
                         valorOriginal: valorOrig,
                         valorAtualizado: valorOrig,
                         vencimentoOriginal: document.getElementById('debVenc').value,
-                        status
+                        status,
+                        editadoPor: admin.nome
                     };
                     AppData.logAction(admin.nome, "EDICAO_DEBITO", `Valores do débito ID ${id} alterados.`);
                 }
@@ -240,7 +241,8 @@
                         valorOriginal: valorOrig,
                         valorAtualizado: valorOrig,
                         vencimentoOriginal: strVenc,
-                        status
+                        status,
+                        criadoPor: admin.nome
                     });
                 }
                 AppData.logAction(admin.nome, "CRIACAO_DEBITO", `Lançado(s) ${qtd} novo(s) débito(s): ${baseDesc}`);

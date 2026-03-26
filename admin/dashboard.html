@@ -80,6 +80,46 @@
             </div>
         </div>
 
+        <!-- SEÇÃO DE DESEMPENHO DOS COLABORADORES -->
+        <!-- MÉTRICAS DE COLABORADORES -->
+        <!-- DASHBOARD DE PRODUTIVIDADE -->
+        <!-- INDICADORES POR USUÁRIO INTERNO -->
+        <header class="header-admin" style="margin-top: 40px; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+            <h2>Desempenho da Equipe e Colaboradores</h2>
+            <p>Acompanhamento individual de produtividade por atendente.</p>
+        </header>
+
+        <div class="grid-3" id="cardsColaboradores" style="margin-top: 0;">
+            <!-- Renderizado via JS -->
+        </div>
+
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+            <!-- TABELA DE RANKING E MÉTRICAS -->
+            <div class="card-admin" style="flex: 2; min-width: 300px;">
+                <h3 style="margin-bottom: 15px;">Ranking e Produtividade</h3>
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>Colaborador</th>
+                            <th>Perfil</th>
+                            <th>Negociações</th>
+                            <th>Ações (Log)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblRankingDesempenho">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ATIVIDADES RECENTES -->
+            <div class="card-admin" style="flex: 1; min-width: 300px;">
+                <h3 style="margin-bottom: 15px;">Atividades Recentes da Equipe</h3>
+                <div class="notifications" id="ultimasAtividadesEquipe">
+                    <!-- Renderizado via JS -->
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script src="../data/db.js"></script>
@@ -122,6 +162,63 @@
                             <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">${new Date(c.dataHora).toLocaleString('pt-BR')}</div>
                             <div>CPF Buscado: <strong>${c.cpfRelacionado || 'Oculto'}</strong></div>
                             <div style="font-size: 0.9em; margin-top:5px;">Status: ${statusStr}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // ==========================================
+            // RENDERIZAÇÃO DO DESEMPENHO DA EQUIPE
+            // ==========================================
+            const usuariosSys = AppData.get('usuarios');
+            const logsAll = AppData.get('logs');
+            const tblRanking = document.getElementById('tblRankingDesempenho');
+            const listCard = document.getElementById('cardsColaboradores');
+            const ativBox = document.getElementById('ultimasAtividadesEquipe');
+
+            let rankingHtml = '';
+            let cardsHtml = '';
+
+            usuariosSys.forEach(user => {
+                const logsUser = logsAll.filter(l => l.usuario === user.nome);
+                const qtdNegociacoes = logsUser.filter(l => l.tipoAcao === "ABERTURA_ACORDO" || l.tipoAcao.includes('NEGOCIACAO')).length;
+                const totalAcoes = logsUser.length;
+
+                // Tabela de Ranking
+                rankingHtml += `
+                    <tr>
+                        <td><strong>${user.nome}</strong></td>
+                        <td>${user.perfil}</td>
+                        <td>${qtdNegociacoes}</td>
+                        <td>${totalAcoes}</td>
+                    </tr>
+                `;
+
+                // Cards Individuais
+                cardsHtml += `
+                    <div class="card-admin" style="border-top: 4px solid var(--cor-principal);">
+                        <div style="font-size:1.1rem; font-weight:bold; margin-bottom: 10px; color:#1e293b;">${user.nome}</div>
+                        <div style="color: #64748b; font-size: 0.9rem;">Total de Negociações: <strong>${qtdNegociacoes}</strong></div>
+                        <div style="color: #64748b; font-size: 0.9rem;">Ações Realizadas: <strong>${totalAcoes}</strong></div>
+                    </div>
+                `;
+            });
+
+            tblRanking.innerHTML = rankingHtml;
+            listCard.innerHTML = cardsHtml;
+
+            // Atividades Recentes
+            const recActivities = logsAll.filter(l => l.usuario !== 'Desconhecido' && l.usuario !== 'Sistema').slice(-6).reverse();
+            if (recActivities.length === 0) {
+                ativBox.innerHTML = '<p style="color:#94a3b8; text-align:center; padding: 20px;">Nenhuma atividade recente.</p>';
+            } else {
+                ativBox.innerHTML = '';
+                recActivities.forEach(l => {
+                    ativBox.innerHTML += `
+                        <div class="notif-item" style="border-left-color: var(--cor-principal); padding: 10px;">
+                            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 3px;">${new Date(l.dataHora).toLocaleString('pt-BR')} - <strong>${l.usuario}</strong></div>
+                            <div style="font-size: 0.85rem; font-weight:bold; color: #1e293b;">${l.tipoAcao}</div>
+                            <div style="font-size: 0.8rem; margin-top:3px;">${l.detalhes}</div>
                         </div>
                     `;
                 });

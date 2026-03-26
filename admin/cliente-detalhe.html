@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dossiê do Cliente - NegociaFácil</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
+    <style>
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; color: #64748b; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab:hover { color: var(--cor-principal); }
+        .tab.active { color: var(--cor-principal); border-bottom-color: var(--cor-principal); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .info-item { background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid var(--cor-principal); }
+        .info-label { font-size: 0.8rem; color: #64748b; }
+        .info-value { font-weight: bold; font-size: 1.1rem; color: #1e293b; }
+    </style>
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+        <nav>
+            <a href="dashboard.html">Visão Geral</a>
+            <a href="negociacoes.html">Solicitações de Acordo</a>
+            <a href="clientes.html" class="active">Gestão de Clientes</a>
+            <a href="debitos.html">Gestão de Débitos</a>
+            <a href="usuarios.html">Equipe / Usuários</a>
+            <a href="logs.html">Auditoria e Logs</a>
+            <a href="configuracoes.html">Configurações</a>
+        </nav>
+        <a href="#" id="btnSairAdmin" class="btn-logout">Sair do Sistema</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-admin" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Dossiê do Cliente</h1>
+                <p id="subtHeader">Carregando dados...</p>
+            </div>
+            <button class="btn btn-outline" onclick="window.location.href='clientes.html'">Voltar para Lista</button>
+        </header>
+
+        <div class="card-admin">
+            <div class="tabs">
+                <div class="tab active" onclick="openTab('dados')">Dados do Cliente</div>
+                <div class="tab" onclick="openTab('debitos')">Débitos</div>
+                <div class="tab" onclick="openTab('negociacoes')">Negociações e Boletos</div>
+                <div class="tab" onclick="openTab('logs')">Histórico e Logs</div>
+            </div>
+
+            <!-- ABA DE DADOS -->
+            <div id="dados" class="tab-content active">
+                <h2 style="margin-bottom: 15px;">Informações Cadastrais</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Nome Completo</div>
+                        <div class="info-value" id="infoNome">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">CPF</div>
+                        <div class="info-value" id="infoCpf">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Telefone de Contato</div>
+                        <div class="info-value" id="infoTelefone">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Dado para Validação</div>
+                        <div class="info-value" id="infoDado">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA DE DÉBITOS -->
+            <div id="debitos" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2>Débitos Vinculados</h2>
+                    <button class="btn" onclick="abrirModalDebito()">+ Novo Débito</button>
+                </div>
+                <!-- VINCULAÇÃO DE DÉBITOS AO CLIENTE -->
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Descrição</th>
+                            <th>Vencimento Original</th>
+                            <th>Valor Original</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblDebitosCliente">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ABA DE NEGOCIAÇÕES E BOLETOS -->
+            <div id="negociacoes" class="tab-content">
+                <h2 style="margin-bottom: 15px;">Histórico de Negociações</h2>
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>Protocolo</th>
+                            <th>Data</th>
+                            <th>Valor Acordo</th>
+                            <th>Condição</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblNegociacoesCliente">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ABA DE LOGS -->
+            <div id="logs" class="tab-content">
+                <h2 style="margin-bottom: 15px;">Auditoria e Movimentações do Cliente</h2>
+                <table class="tbl-admin">
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Usuário/Colaborador</th>
+                            <th>Ação</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblLogsCliente">
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal Novo Débito Específico do Cliente -->
+    <div id="modalDebito" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 500px; max-width: 90%;">
+            <h2 style="margin-bottom: 20px; color: var(--cor-principal);">Lançar Novo Débito</h2>
+            <form id="formNovoDebito">
+                <div class="form-group">
+                    <label>Descrição da Dívida</label>
+                    <input type="text" id="debDescricao" required>
+                </div>
+                <div class="form-group">
+                    <label>Valor Original (R$)</label>
+                    <input type="number" step="0.01" id="debValor" required>
+                </div>
+                <div class="form-group">
+                    <label>Data de Vencimento Original</label>
+                    <input type="date" id="debVencimento" required>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button type="submit" class="btn" style="flex: 1;">Salvar Débito</button>
+                    <button type="button" class="btn btn-outline" onclick="fecharModalDebito()" style="flex: 1; border-color: #64748b; color: #64748b;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../data/db.js"></script>
+    <script src="../scripts/admin.js"></script>
+    <script>
+        // ESTRUTURA DO CLIENTE COMO PASTA DIGITAL
+        // NÃO MISTURAR REGISTROS ENTRE CLIENTES
+        const urlParams = new URLSearchParams(window.location.search);
+        const clienteId = urlParams.get('id');
+        let clienteCompleto = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!clienteId) {
+                alert("Cliente não selecionado.");
+                window.location.href = 'clientes.html';
+                return;
+            }
+            carregarDossie();
+        });
+
+        function openTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`.tab[onclick="openTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function carregarDossie() {
+            clienteCompleto = AppData.getClienteCompleto(clienteId);
+            if (!clienteCompleto) {
+                alert("Cliente não encontrado.");
+                window.location.href = 'clientes.html';
+                return;
+            }
+
+            document.getElementById('subtHeader').innerText = `${clienteCompleto.nome} - CPF: ${clienteCompleto.cpf}`;
+            
+            // ABA DADOS
+            document.getElementById('infoNome').innerText = clienteCompleto.nome;
+            document.getElementById('infoCpf').innerText = clienteCompleto.cpf;
+            document.getElementById('infoTelefone').innerText = clienteCompleto.telefone;
+            document.getElementById('infoDado').innerText = clienteCompleto.dadoValidacao;
+
+            // ABA DÉBITOS
+            const tblDebitos = document.getElementById('tblDebitosCliente');
+            tblDebitos.innerHTML = '';
+            if (clienteCompleto.debitos.length === 0) {
+                tblDebitos.innerHTML = `<tr><td colspan="6" style="text-align:center;">Nenhum débito registrado para este cliente.</td></tr>`;
+            } else {
+                clienteCompleto.debitos.forEach(d => {
+                    tblDebitos.innerHTML += `
+                        <tr>
+                            <td>${d.id}</td>
+                            <td>${d.descricao}</td>
+                            <td>${new Date(d.vencimentoOriginal).toLocaleDateString('pt-BR')}</td>
+                            <td>R$ ${d.valorOriginal.toFixed(2)}</td>
+                            <td><span class="badge ${d.status}">${d.status.toUpperCase().replace('_', ' ')}</span></td>
+                            <td>
+                                <button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem; border-color: red; color: red;" onclick="excluirDebito(${d.id})">Del</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // ABA NEGOCIACOES
+            const tblNegoc = document.getElementById('tblNegociacoesCliente');
+            tblNegoc.innerHTML = '';
+            if (clienteCompleto.negociacoes.length === 0) {
+                tblNegoc.innerHTML = `<tr><td colspan="5" style="text-align:center;">Nenhuma negociação encontrada.</td></tr>`;
+            } else {
+                clienteCompleto.negociacoes.forEach(n => {
+                    const cond = AppData.get('condicoesNegociacao').find(c => c.id == n.condicaoId);
+                    tblNegoc.innerHTML += `
+                        <tr>
+                            <td><strong>${n.protocolo}</strong></td>
+                            <td>${new Date(n.data).toLocaleDateString('pt-BR')}</td>
+                            <td>R$ ${n.valorTotalAcordo.toFixed(2)}</td>
+                            <td>${cond ? cond.descricao : 'Condição Indefinida'}</td>
+                            <td><span class="badge ${n.status}">${n.status.toUpperCase().replace('_', ' ')}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // ABA LOGS
+            const tblLogs = document.getElementById('tblLogsCliente');
+            tblLogs.innerHTML = '';
+            if (clienteCompleto.logs.length === 0) {
+                tblLogs.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum registro de log.</td></tr>`;
+            } else {
+                clienteCompleto.logs.forEach(l => {
+                    tblLogs.innerHTML += `
+                        <tr>
+                            <td>${new Date(l.dataHora).toLocaleString('pt-BR')}</td>
+                            <td><strong>${l.usuario}</strong></td>
+                            <td>${l.tipoAcao}</td>
+                            <td>${l.detalhes}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function abrirModalDebito() {
+            document.getElementById('formNovoDebito').reset();
+            document.getElementById('modalDebito').style.display = 'flex';
+        }
+
+        function fecharModalDebito() {
+            document.getElementById('modalDebito').style.display = 'none';
+        }
+
+        document.getElementById('formNovoDebito').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const debitos = AppData.get('debitos');
+            const admin = JSON.parse(sessionStorage.getItem('adminLogado'));
+            
+            const novoDebito = {
+                id: Date.now(),
+                clienteId: parseInt(clienteId),
+                descricao: document.getElementById('debDescricao').value.trim(),
+                valorOriginal: parseFloat(document.getElementById('debValor').value),
+                vencimentoOriginal: document.getElementById('debVencimento').value,
+                status: 'aberto'
+            };
+
+            debitos.push(novoDebito);
+            AppData.set('debitos', debitos);
+            
+            AppData.logAction(admin.nome, "NOVO_DEBITO", `Débito inserido: ${novoDebito.descricao} - R$ ${novoDebito.valorOriginal}`, clienteCompleto.cpf);
+            
+            fecharModalDebito();
+            carregarDossie(); // recarrega a tela
+            alert("Débito lançado com sucesso na pasta do cliente!");
+        });
+
+        function excluirDebito(idDebito) {
+            if(confirm('Tem certeza que deseja apagar este débito?')) {
+                const debitos = AppData.get('debitos');
+                const admin = JSON.parse(sessionStorage.getItem('adminLogado'));
+                const debitIdx = debitos.findIndex(d => d.id === idDebito);
+                
+                if (debitIdx > -1) {
+                    const desc = debitos[debitIdx].descricao;
+                    debitos.splice(debitIdx, 1);
+                    AppData.set('debitos', debitos);
+                    AppData.logAction(admin.nome, "EXCLUSAO_DEBITO", `Débito removido manualmente: ${desc}`, clienteCompleto.cpf);
+                    carregarDossie();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -116,6 +116,7 @@
                     <td>${c.cpf}</td>
                     <td>${c.telefone}</td>
                     <td>
+                        <button class="btn btn-outline" style="padding:4px 8px; margin-right: 5px; font-size:0.8rem; background-color: var(--cor-secundaria); color: white; border-color: var(--cor-secundaria);" onclick="window.location.href='cliente-detalhe.html?id=${c.id}'">📁 Ver Dossiê</button>
                         <button class="btn btn-outline" style="padding:4px 8px; margin-right: 5px; font-size:0.8rem;" onclick='editar(${JSON.stringify(c).replace(/'/g, "&apos;")})'>Editar</button>
                         <button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem; border-color: red; color: red;" onclick='excluir(${c.id})'>Excluir</button>
                     </td>
