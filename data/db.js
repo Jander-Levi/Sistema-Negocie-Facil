@@ -1,16 +1,17 @@
 // ==========================================
 // INÍCIO DA ÁREA EDITÁVEL
 // CONFIGURAÇÃO MANUAL DE DADOS DO SISTEMA
-// Este arquivo simula um banco de dados e contém 
-// as regras e informações que alimentam o site.
-// Edite os valores abaixo com cuidado.
+// Este arquivo funciona como o nosso "Banco de Dados" (só que simulado).
+// Ele guarda todas as informações que aparecem no site para não perder nada.
+// Como não temos um banco de dados real (tipo SQL), usamos a memória do navegador 
+// chamada "LocalStorage" para guardar essas coisas temporariamente.
 //
 // RELACIONAMENTO ENTRE CLIENTE, DÉBITOS E NEGOCIAÇÕES
 // AÇÃO VINCULADA AO COLABORADOR RESPONSÁVEL
 // ==========================================
 
 const AppData = {
-    // Lista de usuários administrativos
+    // Lista de usuários administrativos (quem pode logar no painel de controle)
     usuarios: [
         { id: 1, nome: "Admin Master", email: "admin@empresa.com", senha: "admin", perfil: "administrador" },
         { id: 2, nome: "João Atendimento", email: "joao@empresa.com", senha: "123", perfil: "atendente" }
@@ -63,6 +64,9 @@ const AppData = {
      * MÉTODOS DE INICIALIZAÇÃO E UTILIDADE (NÃO ALTERAR)
      * Funções para simular um banco de dados real salvando
      * tudo no cache do navegador (LocalStorage).
+     * O LocalStorage é como uma gaveta na mesa do navegador do usuário, 
+     * onde podemos guardar textos e números para que, ao fechar e abrir a página, 
+     * ele ainda lembre o que aconteceu.
      */
     init: function() {
         if (!localStorage.getItem('AppData_usuarios')) {
@@ -75,10 +79,17 @@ const AppData = {
         }
     },
 
+    // Função "get" significa "pegar". Ela vai ler a gaveta (LocalStorage) e devolver os dados
     get: function(tabela) {
+        // Tenta ler o que tá na gaveta com o nome da tabela (ex: AppData_clientes)
+        // O `JSON.parse` transforma aquele texto cru em algo que o JavaScript entende (uma lista/objeto).
+        // Aquele `|| []` no final diz: "Se a gaveta tiver vazia ou não existir, devolva uma lista vazia, pra não dar erro".
         let dados = JSON.parse(localStorage.getItem('AppData_' + tabela)) || [];
+        
+        // Regra especial só para os débitos: a gente recalcula o valor para aplicar juros no vôo!
         if (tabela === 'debitos') {
             dados = dados.map(d => {
+                // Se a dívida estiver aberta ou já negociada o preço é atualizado pela data
                 if(d.status === 'aberto' || d.status === 'em_negociacao') {
                     d.valorAtualizado = this.calcularValorAtualizado(d.valorOriginal, d.vencimentoOriginal);
                 }
@@ -107,7 +118,9 @@ const AppData = {
         return valorOriginal + multa + juros;
     },
 
+    // Função "set" significa "definir/guardar". Ela pega uma lista nova e taca dentro da gaveta (LocalStorage) de novo
     set: function(tabela, dados) {
+        // `JSON.stringify` faz o contrário e converte aquele objeto do JavaScript para um textão que pode ser salvo na gaveta.
         localStorage.setItem('AppData_' + tabela, JSON.stringify(dados));
     },
 

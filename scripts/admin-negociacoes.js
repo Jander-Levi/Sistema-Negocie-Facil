@@ -1,7 +1,9 @@
 // ==========================================
-// SCRIPTS DA ÁREA DE GESTÃO DE NEGOCIAÇÕES
+// SCRIPTS DA ÁREA DE GESTÃO DE NEGOCIAÇÕES (O Centro de Comando)
+// Aqui é onde o atendente vê os pedidos dos clientes e aprova os pagamentos.
 // ==========================================
 
+// Novamente, aguarda a página carregar tudo antes de deixar o código agir.
 document.addEventListener("DOMContentLoaded", () => {
     
     if(!window.location.pathname.includes('negociacoes.html')) return;
@@ -11,18 +13,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalEditar = document.getElementById('modalEditarSolicitacao');
     let solicitacaoAtual = null;
 
+    // Função principal que lê as negociações pendentes no banco de dados e desenha elas na tabela
     function carregarTabela() {
-        const solicitacoes = AppData.get('solicitacoes');
-        const clientes = AppData.get('clientes');
+        const solicitacoes = AppData.get('solicitacoes'); // Pega todas solicitações de acordos
+        const clientes = AppData.get('clientes');         // Pega os perfis dos clientes para saber o nome deles
         
-        tblBody.innerHTML = '';
+        tblBody.innerHTML = ''; // Limpa a tabela para não ficar duplicando as coisas velhas
 
         if(solicitacoes.length === 0) {
             tblBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Não há solicitações de boletos neste momento.</td></tr>';
             return;
         }
 
-        // Ordena para mostrar as mais novas primeiro
+        // Ordena para mostrar as mais novas primeiro ('sort' bagunça e arruma a lista baseada na data)
+        // E logo em seguida embala td num 'forEach' (para processar um por um):
         solicitacoes.sort((a,b) => new Date(b.dataSolicitacao) - new Date(a.dataSolicitacao)).forEach(solic => {
             const cliente = clientes.find(c => c.id === solic.clienteId);
             const nomeCliente = cliente ? cliente.nome : 'Desconhecido';
@@ -81,10 +85,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Abre o Pop-up/Modal do atendente para colocar o código de barras
+    // Essa função é o "Abrir Janelinha". Mostra um pop-up (Modal) por cima da tela pra gerar o código de barra
     function abrirModalBoleto(id) {
-        solicitacaoAtual = id;
-        document.getElementById('lblSolicitacaoId').innerText = "#" + id;
+        solicitacaoAtual = id; // "Memória de Mosquito": O atendente está focando NESSA id de boleto no momento
+        document.getElementById('lblSolicitacaoId').innerText = "#" + id; // Desenha o número ID lá na lousa visual (HTML)
         document.getElementById('txtLinhaDigitavel').value = '';
         document.getElementById('txtObservacao').value = '';
         if (document.getElementById('arquivoBoleto')) document.getElementById('arquivoBoleto').value = '';
@@ -118,23 +122,27 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // REGRA DE ACESSO: Atualizando o JSON/banco simulado
+        // REGRA DE ACESSO: Salvando de fato a alteração no "banco simulado" (LocalStorage)
         const solicitacoes = AppData.get('solicitacoes');
+        // Acha a "gavetinha" exata na lista (index) que é a ficha desse cliente:
         const index = solicitacoes.findIndex(s => s.id === solicitacaoAtual);
 
-        if(index > -1) {
+        if(index > -1) { // Se index é maior que -1, significa que ele realmente achou a pessoa:
+            // Escreve lá na ficha do cidadão avisando que o funcionário mandou o maldito boleto:
             solicitacoes[index].status = 'boleto_enviado';
             solicitacoes[index].linhaDigitavel = linha;
             solicitacoes[index].observacao = obs;
-            solicitacoes[index].dataEnvio = new Date().toISOString();
+            solicitacoes[index].dataEnvio = new Date().toISOString(); // Pega a hora+data exata do clique do atendente
             if (arquivoBase64) {
                 solicitacoes[index].arquivoBoleto = arquivoBase64;
             }
             
+            // Guarda a lista inteira atualizada de volta na gaveta (LocalStorage):
             AppData.set('solicitacoes', solicitacoes);
             
             alert('Parabéns! Boleto marcado como enviado para o cliente.');
             fecharModal();
+            // Dá um "f5" interno chamando a tabela pra ela redesenhar e ficar com a plaquinha verde
             carregarTabela();
         }
     });

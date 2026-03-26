@@ -1,8 +1,11 @@
 // ==========================================
 // SCRIPTS DA ÁREA DO CLIENTE
-// Contém a lógica de interface usada pelo cliente
+// Aqui fica toda a "inteligência" (lógica) da tela do cliente. 
+// É este arquivo que faz os botões funcionarem, busca os dados da pessoa e mostra na tela.
 // ==========================================
 
+// Este comando "DOMContentLoaded" avisa o navegador da internet: 
+// "Só comece a executar esses códigos quando a página HTML inteira terminar de carregar!"
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
@@ -12,9 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputData = document.getElementById('dadoValidacao');
 
     if (inputCpf) {
+        // Toda vez que a pessoa digitar algo ('input') dentro da caixinha do CPF:
         inputCpf.addEventListener('input', function(e) {
-            let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for dígito
-            if (valor.length > 11) valor = valor.slice(0, 11); // Limita a 11 números
+            let valor = e.target.value.replace(/\D/g, ''); // Apaga tudo que não for número (ex: letras ou símbolos)
+            if (valor.length > 11) valor = valor.slice(0, 11); // Se tentar digitar mais que 11 dígitos, ele corta fora os extras.
 
             // Aplica a máscara de CPF: 000.000.000-00
             if (valor.length > 9) {
@@ -44,28 +48,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 1. TELA DE CONSULTA DE CPF
+    // 1. TELA DE CONSULTA DE CPF (A Tela Inicial de Login do Cliente)
+    // É onde ele digita o CPF e a data de nascimento para "entrar".
     // ==========================================
-    const formConsulta = document.getElementById('formConsulta');
+    const formConsulta = document.getElementById('formConsulta'); // Pega o formulário no código da página.
+    
+    // Se o formulário existir (ou seja, se a gente realmente estiver na página inicial):
     if (formConsulta) {
+        // Quando a pessoa clicar no botão de "Consultar/Entrar" ('submit'):
         formConsulta.addEventListener('submit', (e) => {
-            e.preventDefault(); // Evita recarregar a página
+            e.preventDefault(); // Impede a tela de piscar e carregar do zero, para não perder o que foi digitado.
             
+            // Pega os textos que foram digitados nessas caixinhas e recorta os espaços em branco nos finais ('trim'):
             const cpfDigitado = document.getElementById('cpf').value.trim();
             const dadoDigitado = document.getElementById('dadoValidacao').value.trim();
             const erroMsg = document.getElementById('erroMsg');
             
-            // Busca o cliente no "banco de dados" simulado
+            // Pede ao nosso "banco de dados" a lista inteira de clientes.
             const clientes = AppData.get('clientes');
+            // Procura na lista usando o 'find': "Olhe um por um e veja se o CPF e a Data de Nascimento batem com o que foi digitado"
             const clienteEncontrado = clientes.find(c => c.cpf === cpfDigitado && c.dadoValidacao === dadoDigitado);
 
             // REGISTRO AUTOMÁTICO DE CONSULTA DO CLIENTE
             AppData.logAction("Sistema (Cliente Externo)", "CONSULTA_CPF", `Tentativa de consulta via Front. Status: ${clienteEncontrado ? 'Sucesso' : 'Falha'}. CPF mascarado: ***.${cpfDigitado.substring(4,7)}.${cpfDigitado.substring(8,11)}-**`, cpfDigitado);
 
+            // Se os dados baterem ("clienteEncontrado" for verdadeiro):
             if (clienteEncontrado) {
-                // Salva o ID do cliente logado temporariamente (Sessão do navegador)
+                // Guarda uma "etiqueta" na memória rápida do navegador chamada sessionStorage. 
+                // Isso não deixa ele deslogar caso mude de página, mas apaga se ele fechar a aba.
                 sessionStorage.setItem('clienteLogadoId', clienteEncontrado.id);
-                // Redireciona para a página com a lista de débitos
+                
+                // Redireciona a pessoa mandando ela viajar lá pra página "resultado.html"
                 window.location.href = 'resultado.html';
             } else {
                 // Exibe mensagem de erro caso os dados não batam
@@ -77,14 +90,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 2. TELA DE RESULTADOS (LISTA DE DÉBITOS)
+    // 2. TELA DE RESULTADOS (Onde aparece a lista de dívidas e acordos daquele cliente logado)
     // ==========================================
     window.UIResultados = {
+        // A 'init' é a função de pontapé inicial. Ela roda sempre que essa página recarrega.
         init: function() {
+            // Tenta pegar aquela "etiqueta" gravada no login para saber a qual ID de cliente pertence a página:
             const clienteId = sessionStorage.getItem('clienteLogadoId');
+            
+            // Se o ID não for encontrado, quer dizer que alguém tentou acessar a página direto pelo link e está burlando o sistema.
             if(!clienteId) {
-                window.location.href = '../index.html';
-                return;
+                window.location.href = '../index.html'; // Chuta a pessoa de volta pro Início!
+                return; // O 'return' imediatamente aborta a função para que nada mais rode.
             }
 
             const clientes = AppData.get('clientes');
@@ -107,19 +124,29 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         },
 
+        // Essa função pega o ID da pessoa, varre o sistema, acha as dividas abertas desse ID e injeta ali na tela.
         carregarDebitos: function(clienteId) {
-            const todosDebitos = AppData.get('debitos');
+            const todosDebitos = AppData.get('debitos'); // Pega "todas as as dívidas de todo mundo"
+            // 'filter' é um filtro que ignora o resto e pega só as que pertencem a ESSE cliente específico e que tão com status 'aberto'
             const meusDebitos = todosDebitos.filter(d => d.clienteId == clienteId && d.status === 'aberto');
+            
+            // Procura o local vazio marcado no HTML onde a gente deve desenhar a lista.
             const tbody = document.getElementById('tabelaDebitosBody');
-            tbody.innerHTML = '';
+            tbody.innerHTML = ''; // Esvazia o local para limpar sujeiras de outras páginas
 
+            // Se esse cliente tiver zero dividas em aberto...
             if(meusDebitos.length === 0) {
+                // ...Nós escrevemos direto naquele local vazio uma mensagem de sucesso: "Não há débitos"
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Não há débitos em aberto.</td></tr>';
-                return;
+                return; // Para tudo e não continua essa função.
             }
 
+            // O 'forEach' é uma alça de repetição. Imagine um funcionário que processa lista de papéis um após o outro:
+            // "Para cada" (forEach) dívida na mão daquele cara:
             meusDebitos.forEach(debito => {
-                const tr = document.createElement('tr');
+                const tr = document.createElement('tr'); // Cria uma "linha" de tabela na memória (sem exibir ainda)
+                
+                // 'innerHTML' preenche essa linha com pedacinhos de códigos HTML misturados com o preço da dívida e data
                 tr.innerHTML = `
                     <td><input type="checkbox" class="chk-debito" value="${debito.id}" data-valor="${debito.valorAtualizado}"></td>
                     <td>${debito.descricao}</td>
@@ -127,13 +154,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>R$ ${debito.valorOriginal.toFixed(2).replace('.', ',')}</td>
                     <td style="color: var(--cor-principal); font-weight: bold;">R$ ${debito.valorAtualizado.toFixed(2).replace('.', ',')}</td>
                 `;
+                // Finalmente, gruda (append) a nova 'linha' construída em cima na nossa página web:
                 tbody.appendChild(tr);
             });
 
+            // "Escuta" os cliques que ativam ou desativam a caixinha (checkbox). 
+            // Cada click manda rodar o 'calcularTotal()', que soma o preço de tudo que tá tickado.
             const checkboxes = document.querySelectorAll('.chk-debito');
             checkboxes.forEach(chk => chk.addEventListener('change', () => this.calcularTotal()));
         },
 
+        // Puxa e preenche se o cliente já chegou a renegociar outras vezes no passado
         carregarAcordos: function(clienteId) {
             const solicitacoes = AppData.get('solicitacoes');
             const meusAcordos = solicitacoes.filter(s => s.clienteId == clienteId);
@@ -217,23 +248,32 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         },
 
+        // Esta função soma quanto de dinheiro as dívidas "ticketadas" marcadas representam todas juntas
         calcularTotal: function() {
-            let total = 0;
+            let total = 0; // Caixinha que guarda o valor de tudo somado
+            
+            // Pega TODAS as caixinhas de marcação (checkbox) que o cidadão marcou ali pela tela:
             const checkboxes = document.querySelectorAll('.chk-debito:checked');
+            
+            // Passa por cima de cada caixinha dando as voltas da repetição ('forEach')...
             checkboxes.forEach(chk => {
+                // ...E vai tacando o valor extraído da caixinha (parseFloat) e armazenando lá no "total"
                 total += parseFloat(chk.dataset.valor);
             });
 
+            // Atualiza aquele texto R$ 0,00 piscando pela soma bruta na tela pro cliente ler
             document.getElementById('totalSelecionado').innerText = total.toFixed(2).replace('.', ',');
             
             const btnAvancar = document.getElementById('btnAvancarNegociacao');
+            // Se o total na cestinha de pagamento for maior que ZERO (ele deve ter selecionado 1 item no minimo), o botão que antes ficava invisível "aparece". 
             if(total > 0) {
                 btnAvancar.style.display = 'inline-block';
-            } else {
+            } else { // Se não tiver nada marcado, esconde o botão
                 btnAvancar.style.display = 'none';
             }
         },
 
+        // Função do botão "avançar", ela joga o cidadão e a lista inteira marotada pra próxima fase
         avancarNegociacao: function() {
             const checkboxes = document.querySelectorAll('.chk-debito:checked');
             const debitosSelecionados = Array.from(checkboxes).map(chk => parseInt(chk.value));
@@ -244,11 +284,14 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // ==========================================
-    // 3. TELA DE NEGOCIAÇÃO E PARCELAMENTO
+    // 3. TELA DE NEGOCIAÇÃO E PARCELAMENTO (Na hora que o cliente escolhe as formas de pagamento)
     // ==========================================
     window.UINegociacao = {
+        // Ponto de partida sempre que a tela Negociacao for lida
         init: function() {
             const clienteId = sessionStorage.getItem('clienteLogadoId');
+            
+            // Resgata aquele embrulho (com a listinha de ids das dívidas que foram clicadas na página anterior) q tava guardado num bolso temporário (sessionStorage)
             const selecionados = JSON.parse(sessionStorage.getItem('debitosSelecionados') || '[]');
             
             if(!clienteId || selecionados.length === 0) {
@@ -262,10 +305,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = '../index.html';
             });
 
+            // Essa função pinta as caixinhas ("cards") bonitinhas que dá em quantas vezes ele quer dividir.
             this.gerarOpcoes(selecionados);
 
+            // Ouvinte: se esse bendito tentar confirmar "fechar negócio":
             document.getElementById('btnConfirmarAcordo').addEventListener('click', () => {
-                this.solicitarAcordo(clienteId, selecionados);
+                this.solicitarAcordo(clienteId, selecionados); // Aciona o registro de dívida no sistema
             });
         },
 

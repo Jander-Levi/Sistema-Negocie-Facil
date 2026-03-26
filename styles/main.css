@@ -1,23 +1,27 @@
 /* 
  * ==========================================
- * CONFIGURAÇÃO MANUAL DE ESTILOS (CSS)
+ * CONFIGURAÇÃO MANUAL DE ESTILOS (CSS) - "A Roupa do Site"
  * ==========================================
- * Este arquivo controla as cores, fontes e
- * o visual principal da Área do Cliente.
+ * Este arquivo funciona como o guarda-roupas do site. 
+ * É ele que diz quais são as cores, o tamanho da letra e
+ * o visual/beleza principal da Área do Cliente.
+ * Sem ele, o site seria apenas um texto preto no fundo branco.
  */
 
 :root {
-    /* INÍCIO DA ÁREA EDITÁVEL - CORES */
-    --cor-principal: #0b3d91; /* Azul escuro corporativo */
-    --cor-secundaria: #4caf50; /* Verde para botões de sucesso/ação */
-    --cor-fundo: #f4f7f6; /* Cor de fundo suave */
-    --cor-texto: #333333; /* Texto padrão */
-    --cor-texto-claro: #ffffff; /* Texto sobre fundos escuros */
+    /* INÍCIO DA ÁREA EDITÁVEL - CORES (As "Canetas" do site) */
+    --cor-principal: #0b3d91; /* Azul escuro corporativo (A cor base da empresa) */
+    --cor-secundaria: #4caf50; /* Verde para botões de sucesso/ação (Chama atenção) */
+    --cor-fundo: #f4f7f6; /* Cor de fundo suave (Evita cansar o olho do cliente) */
+    --cor-texto: #333333; /* Texto padrão (quase preto) */
+    --cor-texto-claro: #ffffff; /* Texto branco para usar em cima de fundos escuros */
     --fonte-principal: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     /* FIM DA ÁREA EDITÁVEL */
 }
 
 * {
+    /* Essa "estrelinha" significa "Aplique isso em ABSOLUTAMENTE TUDO no site" */
+    /* Aqui dizemos pra remover as margens que os navegadores botam por padrão */
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -220,6 +224,7 @@ footer {
 }
 
 /* Responsividade Avançada (Mobile como App) */
+/* Tudo que está dentro desse "@media" só sará ativado se a tela for pequena (Celulares) */
 @media (max-width: 768px) {
     /* Header fixo no topo com barra de ferramentas */
     header {

@@ -1,7 +1,10 @@
 /* 
  * ==========================================
- * ESTILOS DA ÁREA ADMINISTRATIVA
+ * ESTILOS DA ÁREA ADMINISTRATIVA (O Uniforme da Ferramenta)
  * ==========================================
+ * Diferente do main.css que é focado em beleza para o cliente final,
+ * esse arquivo dita as cores e tamanhos do painel dos funcionários.
+ * Ele foca em ser limpo, rápido e organizado como uma mesa de escritório.
  */
 
 .admin-body {
@@ -10,7 +13,7 @@
     background-color: #f0f2f5;
 }
 
-/* Menu Lateral */
+/* Menu Lateral (Aquela barra escura fixa no canto esquerdo da tela que tem os botões de navegação) */
 .sidebar {
     width: 250px;
     background-color: #1e293b;
@@ -54,7 +57,7 @@
     color: #f87171;
 }
 
-/* Área Principal */
+/* Área Principal (O "miolo" da página onde tudo acontece. É do lado direito da sidebar) */
 .main-content {
     flex: 1;
     padding: 30px;
@@ -99,7 +102,7 @@
     font-weight: 600;
 }
 
-/* Badges de Status */
+/* Badges de Status (Aquelas etiquetas coloridas redondinhas que diz "Pago", "Em Análise", etc.) */
 .badge {
     padding: 5px 10px;
     border-radius: 9999px;

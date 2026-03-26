@@ -1,26 +1,31 @@
 // ==========================================
 // SCRIPTS DA ÁREA ADMINISTRATIVA E ATENDIMENTO
+// Aqui controlamos quem pode entrar no painel de controle e o que podem ver.
 // ==========================================
 
+// Aguarda a página inteira carregar na tela antes de rodar os scripts:
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // 1. TELA DE LOGIN ADMIN
+    // 1. TELA DE LOGIN ADMIN (A porta de entrada dos funcionários)
     // ==========================================
     const formAdminLogin = document.getElementById('formAdminLogin');
-    if (formAdminLogin) {
+    if (formAdminLogin) { // Se a gente estiver na tela de login...
+        // Quando o funcionário clicar no botão de entrar:
         formAdminLogin.addEventListener('submit', (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Impede a tela de piscar e apagar os dados
             
             const email = document.getElementById('emailAdmin').value.trim().toLowerCase();
             const senha = document.getElementById('senhaAdmin').value.trim();
             const erroMsg = document.getElementById('erroLogin');
             
+            // Pega a lista de funcionários autorizados no banco de dados simulado:
             const usuarios = AppData.get('usuarios');
+            // Procura alguém na lista que tenha exatamente o mesmo email e senha:
             const adminEncontrado = usuarios.find(u => u.email.toLowerCase() === email && u.senha === senha);
 
-            if (adminEncontrado) {
-                if(adminEncontrado.status === 'bloqueado') {
+            if (adminEncontrado) { // Se achou um funcionário válido no sistema...
+                if(adminEncontrado.status === 'bloqueado') { // ...mas a conta dele foi desativada pelo chefe:
                     AppData.logAction("Desconhecido", "LOGIN_FALHA", `Tentativa de login de usuário bloqueado: ${email}`);
                     erroMsg.innerHTML = "Acesso negado. Usuário bloqueado pelo administrador.";
                     erroMsg.style.display = 'block';
@@ -39,9 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 2. CONTROLE DE SESSÃO E SEGURANÇA ADMIN
-    // Verifica se a pessoa logou sempre que entra no painel
-    // ÁREA INTERNA DO ADMIN – NÃO EXPOR
+    // 2. CONTROLE DE SESSÃO E SEGURANÇA ADMIN (O "Segurança da Balada")
+    // Ele fica na porta verificando se quem está mexendo no painel realmente fez login.
+    // Evita que intrusos acessem o painel apenas digitando o link direto na barra de endereços.
     // ==========================================
     const isLoginScreen = window.location.pathname.includes('login.html');
     const adminStr = sessionStorage.getItem('adminLogado');
@@ -49,7 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // PROTEÇÃO DE ROTA ADMIN - NÃO EXIBIR NO FRONT PÚBLICO
     if(window.location.pathname.includes('/admin/')) {
         if(!isLoginScreen && !adminStr) {
-            // Expulsa imediatamente quem tenta acessar direto
+            // Se a pessoa tentar acessar as telas de dentro SEM a etiqueta de logado (adminStr), 
+            // expulsa ela na hora de volta pra tela inicial!
             window.location.href = 'login.html';
             return;
         }
@@ -63,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
             userPerfilDisplays.forEach(el => el.innerText = adminUser.perfil.toUpperCase());
 
             // --- CONTROLE DE ACESSO AVANÇADO (PERFIS) ---
+            // Regra: "atendente" não pode cadastrar usuários nem mexer em configurações difíceis.
             if (adminUser.perfil !== 'administrador') {
                 // Esconde os links do menu restritos
                 const navLinks = document.querySelectorAll('nav a');
