@@ -8,7 +8,7 @@ Este documento serve como guia de utilização do **Sistema de Negociação de D
 ---
 
 ## 2. Portal do Cliente (Área Pública)
-Este é o ambiente voltado para o cliente final, onde ele pode consultar de forma autônoma suas pendências e simular propostas de acordo.
+Este é o ambiente voltado para o cliente final, onde ele pode consultar de forma autônoma suas pendências e simular propostas de acordo. A plataforma obedece a uma identidade visual profissional (ex.: logo G2G e favicon).
 
 ### 2.1. Consulta de Pendências
 - O cliente precisará inserir seus dados de identificação (geralmente CPF e Data de Nascimento) para consultar seus débitos.
@@ -25,23 +25,29 @@ Este é o ambiente voltado para o cliente final, onde ele pode consultar de form
 ---
 
 ## 3. Painel Administrativo (Área do Operador)
-Ambiente restrito destinado à equipe interna de negociação e administração do sistema, focado em gerenciar a base de dados e acompanhar o andamento dos acordos.
+Ambiente restrito destinado à equipe interna de negociação e administração do sistema, focado em gerenciar a base de dados, acompanhar o andamento dos acordos e medir a proatividade da equipe.
 
-### 3.1. Dashboard e Visão Geral
-- Tela inicial que apresenta o resumo das operações, permitindo ao operador ter uma visão rápida de quantos acordos estão em andamento ou finalizados.
+### 3.1. Dashboard de Produtividade e Desempenho
+- **Visão Geral:** Tela inicial que apresenta o resumo das operações, permitindo ao operador ou gestor ter uma visão rápida de métricas gerais e individuais.
+- **Ranking de Colaboradores:** Exibe o desempenho da equipe, ranqueando os operadores com base no número de acordos formalizados e clientes atendidos, incentivando a produtividade.
+- **Métricas Individuais:** O operador logado consegue visualizar sua própria performance, quantidade de atendimentos recentes e histórico de ações.
 
-### 3.2. Gerenciamento de Clientes
-- **Cadastro e Edição:** Permite registrar um novo cliente na base, atualizando dados de contato como telefone e informações de validação.
+### 3.2. Gerenciamento de Clientes (Dossiê Digital)
+- **Cadastro e Edição:** Permite registrar um novo cliente na base, atualizando dados de contato como telefone e informações essenciais.
+- **Dossiê do Cliente (Visão 360º):** O perfil do cliente atua como um dossiê digital completo. A partir da ficha (detalhe) do cliente, é possível ver de forma centralizada todos os seus débitos atrelados, os acordos firmados e todos os logs de ações (histórico de contato e alterações) específicos daquele consumidor.
 - **Exclusão:** Os operadores têm a opção de remover clientes da base. 
-  - *Importante:* Ao excluir um cliente, o sistema automaticamente apaga todos os débitos e o histórico de negociações atrelados a ele, garantindo a organização e integridade dos dados na plataforma.
+  - *Importante:* Ao excluir um cliente, o sistema automaticamente apaga todos os débitos e o histórico de negociações atrelados a ele, garantindo a organização e a integridade dos dados na plataforma.
 
 ### 3.3. Lançamento e Gestão de Débitos
-- Nesta seção, o operador visualiza todas as dívidas cadastradas de todos os clientes.
-- Ao cadastrar um novo débito para um cliente, o operador informa a descrição, o valor original e a data de vencimento prevista. O cálculo de atrasos é gerenciado diretamente pela plataforma assim que o prazo vence.
+- Nesta seção, o operador visualiza e cria as dívidas para associá-las a um cliente específico.
+- Ao cadastrar um novo débito, o operador informa a descrição, o valor original e a data de vencimento prevista. O cálculo da evolução da dívida (juros e mora) passa a ser gerenciado automaticamente.
 
-### 3.4. Acompanhamento de Soluções e Acordos
-- Quando um cliente efetua um acordo no portal público, a solicitação cai nessa tela para o acompanhamento do atendente.
-- Na lista de solicitações, o operador tem acesso ao valor negociado final, a quantidade de parcelas e a **Forma de Pagamento** que foi escolhida pelo cliente no ato de fechamento na área pública.
+### 3.4. Gestão de Acordos e Validações
+- Quando um cliente efetua um acordo no portal público, a solicitação entra na área de controle para acompanhamento.
+- A plataforma exibe o valor negociado final, a quantidade de parcelas e a **Forma de Pagamento** escolhida pelo usuário.
+- **Anexo de Documentações (Upload):** O operador conta com o recurso de adicionar em anexo arquivos com extensões comuns, ideal para salvar boletos emitidos ou salvar recibos e comprovantes de pagamento de clientes.
+- **Edição e Validação:** A interface administrativa possui fluxos robustos que permitem alterar ou atualizar o status de acordos (Aguardando Pagamento, Pago, Cancelado, Quebra de Acordo) e validar as tratativas.
 
-### 3.5. Histórico e Logs de Sistema
-- A plataforma conta com um sistema de rastreabilidade (Logs) que registra ações importantes de forma oculta ou visível para auditoria. Ações como exclusão de usuários, consultas e geração de acordos são registradas para maior segurança da operação.
+### 3.5. Histórico e Logs de Sistema Avançados
+- A plataforma conta com um sistema de rastreabilidade (Logs) que registra ações importantes de forma detalhada e auditável.
+- **Atribuição de Autoria:** Todas as ações estratégicas (como inclusão de cliente, remoção de débitos ou alteração manual de acordos) são estritamente vinculadas e logadas constando a autoria do operador que realizou a operação, garantindo total transparência, controle de qualidade e responsabilização na plataforma.
