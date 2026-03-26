@@ -6,6 +6,44 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
+    // MÁSCARAS DE ENTRADA DO CLIENTE
+    // ==========================================
+    const inputCpf = document.getElementById('cpf');
+    const inputData = document.getElementById('dadoValidacao');
+
+    if (inputCpf) {
+        inputCpf.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for dígito
+            if (valor.length > 11) valor = valor.slice(0, 11); // Limita a 11 números
+
+            // Aplica a máscara de CPF: 000.000.000-00
+            if (valor.length > 9) {
+                valor = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+            } else if (valor.length > 6) {
+                valor = valor.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3");
+            } else if (valor.length > 3) {
+                valor = valor.replace(/(\d{3})(\d+)/, "$1.$2");
+            }
+            e.target.value = valor;
+        });
+    }
+
+    if (inputData) {
+        inputData.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for dígito
+            if (valor.length > 8) valor = valor.slice(0, 8); // Limita a 8 números
+
+            // Aplica a máscara de Data: 00/00/0000
+            if (valor.length > 4) {
+                valor = valor.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
+            } else if (valor.length > 2) {
+                valor = valor.replace(/(\d{2})(\d+)/, "$1/$2");
+            }
+            e.target.value = valor;
+        });
+    }
+
+    // ==========================================
     // 1. TELA DE CONSULTA DE CPF
     // ==========================================
     const formConsulta = document.getElementById('formConsulta');
