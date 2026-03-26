@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +8,54 @@
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="../styles/admin.css">
     <style>
-        .chart-container { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding: 20px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .bar { width: 40px; background-color: var(--cor-principal); border-radius: 4px 4px 0 0; text-align: center; color: white; font-size: 0.8rem; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; transition: height 0.5s; }
-        .notifications { max-height: 300px; overflow-y: auto; }
-        .notif-item { padding: 15px; border-left: 4px solid var(--cor-secundaria); background: #f8fafc; margin-bottom: 10px; border-radius: 0 4px 4px 0; }
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 150px;
+            padding: 20px 0;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .bar {
+            width: 40px;
+            background-color: var(--cor-principal);
+            border-radius: 4px 4px 0 0;
+            text-align: center;
+            color: white;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 5px;
+            transition: height 0.5s;
+        }
+
+        .notifications {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notif-item {
+            padding: 15px;
+            border-left: 4px solid var(--cor-secundaria);
+            background: #f8fafc;
+            margin-bottom: 10px;
+            border-radius: 0 4px 4px 0;
+        }
     </style>
     <link rel="icon" type="image/png" href="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png">
 </head>
+
 <body class="admin-body">
 
     <!-- ÁREA INTERNA DO ADMIN – NÃO EXPOR -->
     <!-- PROTEÇÃO DE ROTA ADMIN GARANTIDA PELO admin.js -->
     <aside class="sidebar">
-        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;"> G2G - NegociaFácil Pro</div>
-        
+        <div class="logo-admin"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png"
+                alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil Pro</div>
+
         <div style="padding: 0 20px; margin-bottom: 20px; font-size: 0.9rem; color: #94a3b8;">
             Olá, <strong class="admin-user-name"></strong><br>
             <em class="admin-user-perfil"></em>
@@ -49,7 +84,7 @@
                 <h3 style="color: #64748b; font-size: 1rem; margin-bottom: 10px;">Total de Débitos (Sistema)</h3>
                 <div style="font-size: 2rem; font-weight: bold; color: #1e293b;" id="lblTotalDebitos">0</div>
             </div>
-            
+
             <div class="card-admin" style="border-left: 4px solid #eab308;">
                 <h3 style="color: #64748b; font-size: 1rem; margin-bottom: 10px;">Aguardando Boleto</h3>
                 <div style="font-size: 2rem; font-weight: bold; color: #1e293b;" id="lblSolicitacoesPendentes">0</div>
@@ -127,16 +162,16 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             // Conta os itens de chart baseando nas solicitacoes do db.js
-            const solicitacoes = AppData.get('solicitacoes').filter(s=>s.status !== 'pendente_boleto');
+            const solicitacoes = AppData.get('solicitacoes').filter(s => s.status !== 'pendente_boleto');
             const chartBox = document.getElementById('chartBox');
-            
+
             const sliceSolicit = solicitacoes.slice(-5);
-            if(sliceSolicit.length === 0) {
+            if (sliceSolicit.length === 0) {
                 chartBox.innerHTML = '<span style="color:#94a3b8; align-self:center; margin:auto;">Sem Acordos Finalizados para Exibir</span>';
             } else {
                 let maxVal = Math.max(...sliceSolicit.map(s => s.valorTotalAcordo));
                 if (maxVal === 0) maxVal = 1;
-                
+
                 sliceSolicit.forEach(s => {
                     const alturaPerc = (s.valorTotalAcordo / maxVal) * 100;
                     chartBox.innerHTML += `<div class="bar" style="height: ${Math.max(10, alturaPerc)}%;" title="Acordo R$ ${s.valorTotalAcordo.toFixed(2)}">R$</div>`;
@@ -147,8 +182,8 @@
             const logs = AppData.get('logs');
             const consultas = logs.filter(l => l.tipoAcao === "CONSULTA_CPF").slice(-5).reverse();
             const notifBox = document.getElementById('notifBox');
-            
-            if(consultas.length === 0) {
+
+            if (consultas.length === 0) {
                 notifBox.innerHTML = '<p style="color:#94a3b8; text-align:center; padding: 20px;">Nenhuma consulta registrada nos logs.</p>';
             } else {
                 notifBox.innerHTML = '';
@@ -156,7 +191,7 @@
                     // O log salva: Tentativa de consulta via Front. Status: Sucesso. CPF mascarado: ***.111.111-**
                     const isSuccess = c.detalhes.includes('Sucesso');
                     const statusStr = isSuccess ? '<strong style="color:var(--cor-secundaria);">Validado Encontrado</strong>' : '<strong style="color:#ef4444;">CPF Não Encontrado</strong>';
-                    
+
                     notifBox.innerHTML += `
                         <div class="notif-item" style="${isSuccess ? '' : 'border-left-color: #ef4444;'}">
                             <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">${new Date(c.dataHora).toLocaleString('pt-BR')}</div>
@@ -226,4 +261,5 @@
         });
     </script>
 </body>
+
 </html>
