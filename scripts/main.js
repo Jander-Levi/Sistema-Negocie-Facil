@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>`;
                 }
 
-                acaoHtml += `<br><a href="acordo.html?id=${acordo.id}" target="_blank" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; display: inline-block;">Ver Termo</a>`;
+                acaoHtml += `<br><a href="acordo.html?id=${acordo.id}" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; display: inline-block;">Ver Termo</a>`;
 
                 tr.innerHTML = `
                     <td>${dataFormatada}</td>
