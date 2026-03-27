@@ -10,8 +10,13 @@
 </head>
 
 <body>
+    <!-- CABEÇALHO PÚBLICO -->
     <header>
         <a href="../index.html" class="logo"><img src="https://intranet.g2gsistemas.com.br/arquivos_publicos//logo_g2g.png" alt="Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">NegociaFácil</a>
+        <nav>
+            <a href="../index.html">Início</a>
+            <a href="#" id="btnSair" class="btn btn-outline" style="margin-left: 20px;">Sair</a>
+        </nav>
     </header>
 
     <!-- INÍCIO DA ÁREA EDITÁVEL - MENSAGEM DE SUCESSO -->
@@ -34,6 +39,39 @@
     </main>
     <!-- FIM DA ÁREA EDITÁVEL -->
 
+    <!-- RODAPÉ SEGURO -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>Atendimento</h3>
+                <ul>
+                    <li>0800 123 4567</li>
+                    <li>contato@negociafacil.com.br</li>
+                    <li>Seg a Sex: 08h às 18h</li>
+                    <li>WhatsApp: (11) 99999-9999</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Links Úteis</h3>
+                <ul>
+                    <li><a href="../index.html#como-funciona">Como Funciona</a></li>
+                    <li><a href="../index.html#duvidas">Dúvidas Frequentes</a></li>
+                    <li><a href="consulta.html">Consultar CPF</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>NegociaFácil</h3>
+                <p>A plataforma mais segura e prática para você limpar seu nome e recuperar seu crédito.</p>
+            </div>
+        </div>
+        <div class="footer-seguranca">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            Ambiente 100% seguro e criptografado
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 NegociaFácil. Todos os direitos reservados.</p>
+        </div>
+    </footer>
     <script>
         const ultimaSolicitacaoId = sessionStorage.getItem('ultimaSolicitacaoId');
         if (ultimaSolicitacaoId) {

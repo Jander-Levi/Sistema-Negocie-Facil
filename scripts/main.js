@@ -135,10 +135,22 @@ document.addEventListener("DOMContentLoaded", () => {
             tbody.innerHTML = ''; // Esvazia o local para limpar sujeiras de outras páginas
 
             // Se esse cliente tiver zero dividas em aberto...
+            const divEmptyState = document.getElementById('emptyStateDebitos');
+            const divConteudo = document.getElementById('conteudoDebitos');
+
             if(meusDebitos.length === 0) {
-                // ...Nós escrevemos direto naquele local vazio uma mensagem de sucesso: "Não há débitos"
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Não há débitos em aberto.</td></tr>';
+                if (divEmptyState && divConteudo) {
+                    divEmptyState.style.display = 'block';
+                    divConteudo.style.display = 'none';
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Não há débitos em aberto.</td></tr>';
+                }
                 return; // Para tudo e não continua essa função.
+            } else {
+                if (divEmptyState && divConteudo) {
+                    divEmptyState.style.display = 'none';
+                    divConteudo.style.display = 'block';
+                }
             }
 
             // O 'forEach' é uma alça de repetição. Imagine um funcionário que processa lista de papéis um após o outro:
