@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else if (acordo.status === 'boleto_enviado') {
                     statusBadge = '<span style="color: #22c55e; font-weight: bold;">Pagamento Pendente</span>';
                     acaoHtml = `
-                        <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" onclick="navigator.clipboard.writeText('${acordo.linhaDigitavel}'); alert('Linha digitável copiada!')">Copiar Código</button>
+                        <button class="btn" style="background-color: #64748b; border: none; padding: 4px 8px; font-size: 0.8rem;" onclick="navigator.clipboard.writeText('${acordo.linhaDigitavel}'); alert('Linha digitável copiada!')">Copiar Código</button>
                     `;
                     if (acordo.arquivoBoleto) {
                         acaoHtml += `<a href="${acordo.arquivoBoleto}" download="Boleto_${acordo.id}.pdf" class="btn" style="padding: 4px 8px; font-size: 0.8rem;">Baixar Boleto</a>`;
@@ -229,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 acaoHtml = `<div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center; max-width: 320px;">
                     ${acaoHtml}
-                    <a href="acordo.html?id=${acordo.id}" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;">Ver Termo</a>
+                    <a href="acordo.html?id=${acordo.id}" class="btn" style="background-color: var(--cor-principal); border: none; color: white; padding: 4px 8px; font-size: 0.8rem;">Ver Termo</a>
                 </div>`;
 
                 tr.innerHTML = `
