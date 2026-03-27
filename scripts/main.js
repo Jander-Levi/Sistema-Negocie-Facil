@@ -181,17 +181,18 @@ document.addEventListener("DOMContentLoaded", () => {
             const solicitacoes = AppData.get('solicitacoes');
             const meusAcordos = solicitacoes.filter(s => s.clienteId == clienteId);
             
-            const secao = document.getElementById('secaoAcordos');
+            const secao = document.getElementById('aba-acordos');
             const tbody = document.getElementById('tabelaAcordosBody');
             
             if(!secao || !tbody) return;
 
             if(meusAcordos.length === 0) {
-                secao.style.display = 'none';
+                // Ao usar abas, não podemos dar display:none na aba inteira, senão ela some ao clicar nela caso não tenha acordo.
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Não há solicitações geradas.</td></tr>';
                 return;
             }
 
-            secao.style.display = 'block';
+            // O display do bloco principal agora é controlado pela função mostrarAba.
             tbody.innerHTML = '';
 
             meusAcordos.forEach(acordo => {
