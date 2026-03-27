@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('lblSolicitacaoId').innerText = "#" + id; // Desenha o número ID lá na lousa visual (HTML)
         document.getElementById('txtLinhaDigitavel').value = '';
         document.getElementById('txtObservacao').value = '';
+        document.getElementById('txtMensagemCliente').value = '';
         if (document.getElementById('arquivoBoleto')) document.getElementById('arquivoBoleto').value = '';
         modal.style.display = 'flex';
     }
@@ -105,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('btnSalvarBoleto').addEventListener('click', async () => {
         const linha = document.getElementById('txtLinhaDigitavel').value.trim();
         const obs = document.getElementById('txtObservacao').value.trim();
+        const msgCliente = document.getElementById('txtMensagemCliente').value.trim();
         const fileInput = document.getElementById('arquivoBoleto');
         let arquivoBase64 = null;
 
@@ -132,6 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
             solicitacoes[index].status = 'boleto_enviado';
             solicitacoes[index].linhaDigitavel = linha;
             solicitacoes[index].observacao = obs;
+            solicitacoes[index].mensagemCliente = msgCliente;
             solicitacoes[index].dataEnvio = new Date().toISOString(); // Pega a hora+data exata do clique do atendente
             if (arquivoBase64) {
                 solicitacoes[index].arquivoBoleto = arquivoBase64;
@@ -158,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('editValorTotal').value = solic.valorTotalAcordo || 0;
             document.getElementById('editFormaPagamento').value = solic.formaPagamento || '';
             document.getElementById('editObservacao').value = solic.observacao || '';
+            document.getElementById('editMensagemCliente').value = solic.mensagemCliente || '';
             
             modalEditar.style.display = 'flex';
         }
@@ -179,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
             solicitacoes[index].valorTotalAcordo = parseFloat(document.getElementById('editValorTotal').value);
             solicitacoes[index].formaPagamento = document.getElementById('editFormaPagamento').value.trim();
             solicitacoes[index].observacao = document.getElementById('editObservacao').value.trim();
+            solicitacoes[index].mensagemCliente = document.getElementById('editMensagemCliente').value.trim();
             
             AppData.set('solicitacoes', solicitacoes);
             alert('Solicitação atualizada com sucesso!');
