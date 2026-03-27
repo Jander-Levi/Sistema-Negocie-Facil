@@ -47,7 +47,7 @@ const AppData = {
     condicoesNegociacao: [
         { id: 1, parcelas: 1, jurosAoMes: 0, descricao: "À vista" },
         { id: 2, parcelas: 3, jurosAoMes: 2.0, descricao: "Em 3x com juros de 2.0% a.m." },
-        { id: 3, parcelas: 6, jurosAoMes: 2.0, descricao: "Em 6x com juros de 1.5% a.m." }
+        { id: 3, parcelas: 6, jurosAoMes: 2.0, descricao: "Em 6x com juros de 2.0% a.m." }
     ],
 
     // Lista vazia inicial de solicitações feitas (Negociações abertas pelo cliente)
@@ -76,6 +76,9 @@ const AppData = {
             localStorage.setItem('AppData_condicoes', JSON.stringify(this.condicoesNegociacao));
             localStorage.setItem('AppData_solicitacoes', JSON.stringify(this.solicitacoes));
             localStorage.setItem('AppData_logs', JSON.stringify(this.logs));
+        } else {
+            // Força a atualização das condições para aplicar mudanças no código
+            localStorage.setItem('AppData_condicoes', JSON.stringify(this.condicoesNegociacao));
         }
     },
 
