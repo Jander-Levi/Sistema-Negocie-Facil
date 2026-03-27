@@ -46,8 +46,8 @@ const AppData = {
     // Opções de parcelamento possíveis baseadas no valor total
     condicoesNegociacao: [
         { id: 1, parcelas: 1, jurosAoMes: 0, descricao: "À vista" },
-        { id: 2, parcelas: 3, jurosAoMes: 0.0, descricao: "Em 3x sem juros" },
-        { id: 3, parcelas: 6, jurosAoMes: 1.5, descricao: "Em 6x com juros de 1.5% a.m." }
+        { id: 2, parcelas: 3, jurosAoMes: 2.0, descricao: "Em 3x com juros de 2.0% a.m." },
+        { id: 3, parcelas: 6, jurosAoMes: 2.0, descricao: "Em 6x com juros de 1.5% a.m." }
     ],
 
     // Lista vazia inicial de solicitações feitas (Negociações abertas pelo cliente)
