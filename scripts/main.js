@@ -194,6 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // O display do bloco principal agora é controlado pela função mostrarAba.
             tbody.innerHTML = '';
+            
+            let totalMensagens = 0;
+            let htmlMensagens = '';
 
             meusAcordos.forEach(acordo => {
                 const tr = document.createElement('tr');
@@ -228,6 +231,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 if (acordo.mensagemCliente) {
+                    totalMensagens++;
+                    htmlMensagens += `
+                        <div style="background: white; border-left: 4px solid var(--cor-principal); padding: 12px; margin-bottom: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px; font-weight: bold;">Ref. Acordo #${acordo.id}</div>
+                            <div style="font-size: 0.95rem; color: #334155; line-height: 1.4;">${acordo.mensagemCliente}</div>
+                        </div>
+                    `;
+                    
                     acaoHtml += `<div style="margin-top: 8px; padding: 8px; background-color: #f8fafc; border-left: 3px solid var(--cor-principal); border-radius: 4px; font-size: 0.85rem; color: #334155; line-height: 1.4;">
                         <strong>Mensagem:</strong><br>${acordo.mensagemCliente}
                     </div>`;
@@ -244,6 +255,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
                 tbody.appendChild(tr);
             });
+            
+            // Popula o widget flutuante se houver mensagens
+            const widget = document.getElementById('widgetNotificacoes');
+            const listaMsg = document.getElementById('listaMensagens');
+            const badge = document.getElementById('badgeNotificacao');
+            
+            if (widget && listaMsg && badge) {
+                if (totalMensagens > 0) {
+                    widget.style.display = 'block';
+                    listaMsg.innerHTML = htmlMensagens;
+                    badge.innerText = totalMensagens;
+                } else {
+                    widget.style.display = 'none';
+                }
+            }
         },
 
         enviarComprovante: async function(acordoId, fileInput) {
