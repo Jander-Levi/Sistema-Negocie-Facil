@@ -194,9 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // O display do bloco principal agora é controlado pela função mostrarAba.
             tbody.innerHTML = '';
-            
-            let totalMensagens = 0;
-            let htmlMensagens = '';
 
             meusAcordos.forEach(acordo => {
                 const tr = document.createElement('tr');
@@ -207,18 +204,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 if (acordo.status === 'pendente_boleto') {
                     statusBadge = '<span style="color: #eab308; font-weight: bold;">Em Análise</span>';
-                    acaoHtml = 'Aguardando liberação';
+                    acaoHtml = '<span style="font-size:0.8rem;">Aguardando liberação</span>';
                 } else if (acordo.status === 'boleto_enviado') {
                     statusBadge = '<span style="color: #22c55e; font-weight: bold;">Pagamento Pendente</span>';
                     acaoHtml = `
-                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; margin-bottom:5px;" onclick="navigator.clipboard.writeText('${acordo.linhaDigitavel}'); alert('Linha digitável copiada!')">Copiar Código</button>
+                        <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" onclick="navigator.clipboard.writeText('${acordo.linhaDigitavel}'); alert('Linha digitável copiada!')">Copiar Código</button>
                     `;
                     if (acordo.arquivoBoleto) {
-                        acaoHtml += `<br><a href="${acordo.arquivoBoleto}" download="Boleto_${acordo.id}.pdf" class="btn" style="padding: 5px 10px; font-size: 0.8rem; margin-bottom:5px; display: inline-block;">Baixar Boleto</a>`;
+                        acaoHtml += `<a href="${acordo.arquivoBoleto}" download="Boleto_${acordo.id}.pdf" class="btn" style="padding: 4px 8px; font-size: 0.8rem;">Baixar Boleto</a>`;
                     }
-                    acaoHtml += `<br>
+                    acaoHtml += `
                         <input type="file" id="comprovante_${acordo.id}" style="display:none;" accept="image/*,.pdf" onchange="UIResultados.enviarComprovante(${acordo.id}, this)">
-                        <button class="btn" onclick="document.getElementById('comprovante_${acordo.id}').click()" style="padding: 5px 10px; font-size: 0.8rem; margin-bottom:5px;">Anexar Comprovante</button>
+                        <button class="btn" onclick="document.getElementById('comprovante_${acordo.id}').click()" style="padding: 4px 8px; font-size: 0.8rem;">Anexar Comprovante</button>
                     `;
                 } else if(acordo.status === 'comprovante_enviado') {
                     statusBadge = '<span style="color: #3b82f6; font-weight: bold;">Em Validação</span>';
@@ -230,17 +227,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     statusBadge = `<span>${acordo.status}</span>`;
                 }
 
-                if (acordo.mensagemCliente) {
-                    totalMensagens++;
-                    htmlMensagens += `
-                        <div style="background: white; border-left: 4px solid var(--cor-principal); padding: 12px; margin-bottom: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px; font-weight: bold;">Ref. Acordo #${acordo.id}</div>
-                            <div style="font-size: 0.95rem; color: #334155; line-height: 1.4;">${acordo.mensagemCliente}</div>
-                        </div>
-                    `;
-                }
-
-                acaoHtml += `<br><a href="acordo.html?id=${acordo.id}" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; display: inline-block;">Ver Termo</a>`;
+                acaoHtml = `<div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center; max-width: 320px;">
+                    ${acaoHtml}
+                    <a href="acordo.html?id=${acordo.id}" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;">Ver Termo</a>
+                </div>`;
 
                 tr.innerHTML = `
                     <td>${dataFormatada}</td>
@@ -251,21 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
                 tbody.appendChild(tr);
             });
-            
-            // Popula o widget flutuante se houver mensagens
-            const widget = document.getElementById('widgetNotificacoes');
-            const listaMsg = document.getElementById('listaMensagens');
-            const badge = document.getElementById('badgeNotificacao');
-            
-            if (widget && listaMsg && badge) {
-                if (totalMensagens > 0) {
-                    widget.style.display = 'block';
-                    listaMsg.innerHTML = htmlMensagens;
-                    badge.innerText = totalMensagens;
-                } else {
-                    widget.style.display = 'none';
-                }
-            }
         },
 
         enviarComprovante: async function(acordoId, fileInput) {
