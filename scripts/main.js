@@ -238,10 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div style="font-size: 0.95rem; color: #334155; line-height: 1.4;">${acordo.mensagemCliente}</div>
                         </div>
                     `;
-                    
-                    acaoHtml += `<div style="margin-top: 8px; padding: 8px; background-color: #f8fafc; border-left: 3px solid var(--cor-principal); border-radius: 4px; font-size: 0.85rem; color: #334155; line-height: 1.4;">
-                        <strong>Mensagem:</strong><br>${acordo.mensagemCliente}
-                    </div>`;
                 }
 
                 acaoHtml += `<br><a href="acordo.html?id=${acordo.id}" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; display: inline-block;">Ver Termo</a>`;
