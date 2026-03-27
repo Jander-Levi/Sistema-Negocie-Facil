@@ -112,7 +112,7 @@ const AppData = {
         const diasAtraso = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         const multa = valorOriginal * 0.02; // Multa de 2%
-        const jurosPorDia = (0.01 / 30); // 1% ao mês / 30 dias
+        const jurosPorDia = 0.033 / 100; // 0,033% ao dia
         const juros = valorOriginal * jurosPorDia * diasAtraso;
         
         return valorOriginal + multa + juros;
